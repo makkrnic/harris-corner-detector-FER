@@ -1,7 +1,9 @@
 #include <cv.h>
 #include <highgui.h>
 
-void plot_harris_points (IplImage *image, CvPoint *filtered_coords) {
+#include "harris.hpp"
+
+void plot_harris_points (IplImage *image, std::vector<CvPoint>& filtered_coords) {
   
   cvNamedWindow ("HarrisPoints", 0);
   cvShowImage ("HarrisPoints", image);
