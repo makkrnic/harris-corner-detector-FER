@@ -3,7 +3,7 @@
 
 #include "harris.hpp"
 
-void plot_harris_points (IplImage *image, std::vector<CvPoint>& filtered_coords) {
+void plotHarrisPoints (IplImage *image, std::vector<CvPoint>& filtered_coords) {
   
   cvNamedWindow ("HarrisPoints", 0);
   cvShowImage ("HarrisPoints", image);

@@ -16,7 +16,7 @@ int main (int argc, char *argv[]) {
 
   points.push_back (tmpPoint);
 
-  plot_harris_points (img, points);
+  plotHarrisPoints (img, points);
 
   return 0;
 }
