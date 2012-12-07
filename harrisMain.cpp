@@ -7,7 +7,7 @@
 #include "harris.hpp"
 
 int main (int argc, char *argv[]) {
-  IplImage *img = cvCreateImage(cvSize(800,500),IPL_DEPTH_8U, 3);
+  IplImage *img;
   std::vector<CvPoint> points;
   CvPoint tmpPoint;
 
@@ -33,6 +33,12 @@ int main (int argc, char *argv[]) {
         return 1;
     }
   }
+
+  if ((img = cvLoadImage (imgName, CV_LOAD_IMAGE_GRAYSCALE)) == NULL) {
+    fprintf (stderr, "Greska pri citanju fajla.\n");
+    return 2;
+  }
+
 
 
 
