@@ -14,7 +14,7 @@ int main( int argc, char** argv )
      return -1;
     }
 
-    Mat image;
+    Mat image, blurred;
     image = imread(argv[1], CV_LOAD_IMAGE_COLOR);   // Read the file
 
     if(! image.data )                              // Check for invalid input
@@ -23,11 +23,13 @@ int main( int argc, char** argv )
         return -1;
     }
 
+    GaussianBlur(image, blurred, 5, 5);
+
     namedWindow( "Original image", CV_WINDOW_AUTOSIZE );// Create a window for display.
     namedWindow( "Gaussian blur", CV_WINDOW_AUTOSIZE );// Create a window for display.
 
     imshow( "Original image", image );                   // Show our image inside it.
-    imshow( "Gaussian blur", image );                   // Show our image inside it.
+    imshow( "Gaussian blur", blurred );                   // Show our image inside it.
 
     waitKey(0);                                          // Wait for a keystroke in the window
     return 0;
