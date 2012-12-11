@@ -51,7 +51,7 @@ void grayscaleGaussianBlur(Mat source, Mat destination, int sizeX, int sizeY) {
         sum += kernelX[i];
     }
     for (int i = 0; i < sizeX; ++i) {
-        kernelX[i] /= 2*sum;
+        kernelX[i] /= sum;
 //        cout << "kernelX[" << i << "] = " << kernelX[i] << endl;
     }
 
@@ -68,23 +68,33 @@ void grayscaleGaussianBlur(Mat source, Mat destination, int sizeX, int sizeY) {
             sum += kernelY[i];
         }
         for( int i = 0; i < sizeY; ++i ) {
-            kernelY[i] /= 2*sum;
+            kernelY[i] /= sum;
 //            cout << "kernelY[" << i << "] = " << kernelY[i] << endl;
         }
     }
 
-    // apply kernelX to image
+    Mat tmp = destination.clone();
+
+    // convolve image with kernelX
     double valueX, valueY;
     for (int i = 0; i < source.rows; ++i) {
         for (int j = 0; j < source.cols; ++j) {
-            valueX = valueY = 0;
+            valueX = 0;
             for (int k = 0; k < sizeX; ++k) {
                 valueX += kernelX[k] * getMatElement(source, i, j + k - radiusX);
             }
+            tmp.at<uchar>(i, j) = (uchar)(valueX);
+        }
+    }
+
+    // convolve image with kernelY
+    for (int i = 0; i < tmp.rows; ++i) {
+        for (int j = 0; j < tmp.cols; ++j) {
+            valueY = 0;
             for (int k = 0; k < sizeY; ++k) {
                 valueY += kernelY[k] * getMatElement(source, i + k - radiusY, j);
             }
-            destination.at<uchar>(i, j) = (uchar)(valueX + valueY);
+            destination.at<uchar>(i, j) = (uchar)(valueY);
         }
     }
 
