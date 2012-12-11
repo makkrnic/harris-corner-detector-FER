@@ -1,7 +1,7 @@
 PROJECT			= harris_detector
 
 CC				= g++
-CFLAGS			= -c -Wall
+CFLAGS			= -c -g -Wall
 LDFLAGS			= 
 
 SOURCES  		= harris.cpp harrisMain.cpp gaussian.cpp testGauss.cpp
