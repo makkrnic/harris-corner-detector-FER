@@ -11,6 +11,8 @@ void grayscaleGaussianBlur(Mat source, Mat destination, int sizeX, int sizeY) {
 	assert(sizeY % 2 == 1);
 
     // Assert that the image matrices are grayscale
+    assert(source.type() == CV_8UC1);
+    assert(destination.type() == CV_8UC1);
 
     int radiusX = (sizeX-1)/2;
     int radiusY = (sizeY-1)/2;
