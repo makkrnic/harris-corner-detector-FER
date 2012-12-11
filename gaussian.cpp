@@ -5,10 +5,12 @@ using namespace std;
 
 #define PI 3.141592654
 
-void GaussianBlur(Mat source, Mat destination, int sizeX, int sizeY) {
+void grayscaleGaussianBlur(Mat source, Mat destination, int sizeX, int sizeY) {
 	// Assert that the kernel sizes are odd and positive
 	assert(sizeX % 2 == 1);
 	assert(sizeY % 2 == 1);
+
+    // Assert that the image matrices are grayscale
 
     int radiusX = (sizeX-1)/2;
     int radiusY = (sizeY-1)/2;

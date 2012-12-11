@@ -6,24 +6,24 @@
 using namespace cv;
 using namespace std;
 
-int main( int argc, char** argv )
-{
-    if( argc != 2)
-    {
-     cout <<" Usage: " << argv[0] << " ImageToLoadAndDisplay" << endl;
-     return -1;
-    }
-
-    Mat image, blurred;
-    image = imread(argv[1], CV_LOAD_IMAGE_COLOR);   // Read the file
-
-    if(! image.data )                              // Check for invalid input
-    {
-        cout <<  "Could not open or find the image" << std::endl ;
+int main( int argc, char** argv ) {
+    if( argc != 3) {
+        cout <<" Usage: " << argv[0] << " ImageToBlur BlurRadius" << endl;
         return -1;
     }
 
-    GaussianBlur(image, blurred, 5, 5);
+    Mat image, blurred;
+    image = imread(argv[1], CV_LOAD_IMAGE_GRAYSCALE);   // Read the file
+
+    // create empty result matrix for grayscale image - 8-bit, unsigned, 1-channel
+    blurred = Mat(image.size(), CV_8UC1, Scalar(0));
+
+    if(! image.data ) {                              // Check for invalid input
+        cout <<  "Could not open or find the image" << endl ;
+        return -1;
+    }
+
+    grayscaleGaussianBlur(image, blurred, 5, 5);
 
     namedWindow( "Original image", CV_WINDOW_AUTOSIZE );// Create a window for display.
     namedWindow( "Gaussian blur", CV_WINDOW_AUTOSIZE );// Create a window for display.

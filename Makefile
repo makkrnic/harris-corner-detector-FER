@@ -4,7 +4,7 @@ CC				= g++
 CFLAGS			= -c -Wall
 LDFLAGS			= 
 
-SOURCES  		= harris.cpp harrisMain.cpp gaussian.cpp test.cpp
+SOURCES  		= harris.cpp harrisMain.cpp gaussian.cpp testGauss.cpp
 OBJECTS 		= ${SOURCES:.cpp=.o}
 
 EXECUTABLE	= harrisDetector
@@ -14,10 +14,10 @@ CFLAGS			+= `pkg-config --cflags opencv`
 LDFLAGS			+= `pkg-config --libs opencv`
 
 
-gauss: gaussian.h gaussian.cpp test.cpp
+gauss: gaussian.h gaussian.cpp testGauss.cpp
 	$(CC) $(CFLAGS) gaussian.cpp -o gaussian.o
-	$(CC) $(CFLAGS) test.cpp -o test.o
-	$(CC) gaussian.o test.o -o gauss $(LDFLAGS)
+	$(CC) $(CFLAGS) testGauss.cpp -o testGauss.o
+	$(CC) gaussian.o testGauss.o -o gauss $(LDFLAGS)
 
 all: $(SOURCES) $(EXECUTABLE)
 
