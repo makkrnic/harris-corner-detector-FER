@@ -6,7 +6,7 @@ using namespace std;
 #define PI 3.141592654
 
 // simple wrapper for accessing single-channel matrix elements
-uchar getMatElement(Mat matrix, int i, int j) {
+inline uchar getMatElement(Mat matrix, int i, int j) {
     assert(matrix.type() == CV_8UC1);
     if (i < 0 || i >= matrix.rows || j < 0 || j >= matrix.cols) {
         return 0;
