@@ -17,6 +17,10 @@ uchar getMatElement(Mat matrix, int i, int j) {
 }
 
 void grayscaleGaussianBlur(Mat source, Mat destination, int sizeX, int sizeY) {
+    if(sizeY == -1) {
+        sizeY = sizeX;
+    }
+
 	// assert that the kernel sizes are odd and positive
 	assert(sizeX % 2 == 1);
 	assert(sizeY % 2 == 1);
@@ -48,7 +52,7 @@ void grayscaleGaussianBlur(Mat source, Mat destination, int sizeX, int sizeY) {
     }
     for (int i = 0; i < sizeX; ++i) {
         kernelX[i] /= 2*sum;
-        cout << "kernelX[" << i << "] = " << kernelX[i] << endl;
+//        cout << "kernelX[" << i << "] = " << kernelX[i] << endl;
     }
 
     // if the sizes are equal, the kernels also are
@@ -65,7 +69,7 @@ void grayscaleGaussianBlur(Mat source, Mat destination, int sizeX, int sizeY) {
         }
         for( int i = 0; i < sizeY; ++i ) {
             kernelY[i] /= 2*sum;
-            cout << "kernelY[" << i << "] = " << kernelY[i] << endl;
+//            cout << "kernelY[" << i << "] = " << kernelY[i] << endl;
         }
     }
 
@@ -84,7 +88,7 @@ void grayscaleGaussianBlur(Mat source, Mat destination, int sizeX, int sizeY) {
         }
     }
 
-    // dealocate
+    // dealocate space
     delete [] kernelX;
     if(sizeY != sizeX) {
         delete [] kernelY;

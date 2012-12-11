@@ -24,7 +24,7 @@ int main( int argc, char** argv ) {
         return -1;
     }
 
-    grayscaleGaussianBlur(image, blurred, 2*radius+1, 2*radius+1);
+    grayscaleGaussianBlur(image, blurred, 2*radius+1);
 
     namedWindow( "Original image", CV_WINDOW_AUTOSIZE );// Create a window for display.
     namedWindow( "Gaussian blur", CV_WINDOW_AUTOSIZE );// Create a window for display.
