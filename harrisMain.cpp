@@ -4,10 +4,12 @@
 #include <cxcore.h>
 #include <vector>
 
+#include "gaussian.h"
+#include "get_harris_points.hpp"
 #include "harris.hpp"
 
 int main (int argc, char *argv[]) {
-  IplImage *img;
+  Mat img, imgBlurred;
   std::vector<CvPoint> points;
   CvPoint tmpPoint;
 
@@ -34,11 +36,21 @@ int main (int argc, char *argv[]) {
     }
   }
 
-  if ((img = cvLoadImage (imgName, CV_LOAD_IMAGE_GRAYSCALE)) == NULL) {
+  //if ((img = cvLoadImage (imgName, CV_LOAD_IMAGE_GRAYSCALE)) == NULL) {
+  img = imread (imgName, CV_LOAD_IMAGE_GRAYSCALE);
+  if (img.empty()) {
     fprintf (stderr, "Greska pri citanju fajla.\n");
     return 2;
   }
 
+  
+  imgBlurred = Mat (img.size(), CV_8UC1, Scalar::all(0));
+  // Prvo treba zagladiti sliku:
+  grayscaleGaussianBlur (img, imgBlurred, 11);
+  
+
+
+  //points = get_harris_points (img); 
 
 
 
@@ -48,7 +60,7 @@ int main (int argc, char *argv[]) {
 
   points.push_back (tmpPoint);
 
-  plotHarrisPoints (img, points);
+  plotHarrisPoints (imgBlurred, points);
 
   return 0;
 }
