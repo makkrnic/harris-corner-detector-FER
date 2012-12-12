@@ -3,12 +3,14 @@
 
 #include "harris.hpp"
 
-void plotHarrisPoints (IplImage *image, std::vector<CvPoint>& filtered_coords) {
-  CvSize imSize = cvSize (image->width, image->height);
+void plotHarrisPoints (Mat imageMat, std::vector<CvPoint>& filtered_coords) {
+  //CvSize imSize = cvSize (image->width, image->height);
+  IplImage image = imageMat;
+  CvSize imSize = imageMat.size();
 
   IplImage *imgColored = cvCreateImage (imSize, IPL_DEPTH_8U, 3);
 
-  cvCvtColor (image, imgColored, CV_GRAY2BGR);
+  cvCvtColor (&image, imgColored, CV_GRAY2BGR);
 
   // crvena boja. Iz nekog razloga je BGR umjesto RGB.
   CvScalar pointColor = cvScalar (0, 0, 255);
