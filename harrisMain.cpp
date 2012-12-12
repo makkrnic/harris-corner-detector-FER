@@ -5,6 +5,7 @@
 #include <vector>
 
 #include "harris.hpp"
+#include "get_harris_points.hpp"
 
 int main (int argc, char *argv[]) {
   IplImage *img;
@@ -40,13 +41,15 @@ int main (int argc, char *argv[]) {
   }
 
 
+ points = get_harris_points (img); 
+
 
 
   // Testni podaci
-  tmpPoint.x = 300;
-  tmpPoint.y = 300;
+  // tmpPoint.x = 300;
+  // tmpPoint.y = 300;
 
-  points.push_back (tmpPoint);
+  // points.push_back (tmpPoint);
 
   plotHarrisPoints (img, points);
 

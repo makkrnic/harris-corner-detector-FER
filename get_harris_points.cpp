@@ -1,11 +1,4 @@
-#include <iostream>
-#include <list>
-#include <math.h>
-#include <algorithm>
-#include <array>
-#include <opencv\cv.h>
-#include <opencv\highgui.h>
-#include <opencv\cvaux.h>
+#include "get_harris_points.hpp"
 
 using namespace cv;
 using namespace std;
@@ -80,10 +73,10 @@ list<int> vrijednosna(Mat harrisim, int* coords, int k)
 	return povratna;
 }
 
-list<int> get_harris_points (Mat harrisim, int min_dist=10, float threshold=0.1)
+std::vector<CvPoint> get_harris_points (Mat harrisim, int min_dist=10, float threshold=0.1)
     //""" Return corners from a Harris response image min_dist is the minimum number of pixels separating corners and image boundary. """	
 	{
-    list<int> filtered_coords;
+    std::vector<CvPoint>  filtered_coords;
     Mat harrisim_t=Mat();
 	list<int> candidate_values;
 	list<int>::iterator i;
@@ -141,8 +134,10 @@ list<int> get_harris_points (Mat harrisim, int min_dist=10, float threshold=0.1)
 		b++;
         if (allowed_locations[coords[b]][coords[b+1]] == 1)
 		{
-			filtered_coords.push_back (coords[b]);
-			filtered_coords.push_back (coords[b+1]);
+			// filtered_coords.push_back (coords[b]);
+			// filtered_coords.push_back (coords[b+1]);
+      CvPoint tmpPoint = {coords[b], coords[b+1]};
+      filtered_coords.push_back(tmpPoint);
 			prosiri (allowed_locations, coords[b], coords[b+1], min_dist);
             //allowed_locations[(coords[*i,0]-min_dist):(coords[*i,0]+min_dist),
             //(coords[*i,1]-min_dist):(coords[*i,1]+min_dist)] = 0
