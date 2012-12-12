@@ -92,7 +92,7 @@ void grayscaleGaussianBlur(Mat source, Mat destination, int sizeX, int sizeY) {
         for (int j = 0; j < tmp.cols; ++j) {
             valueY = 0;
             for (int k = 0; k < sizeY; ++k) {
-                valueY += kernelY[k] * getMatElement(source, i + k - radiusY, j);
+                valueY += kernelY[k] * getMatElement(tmp, i + k - radiusY, j);
             }
             destination.at<uchar>(i, j) = (uchar)(valueY);
         }
