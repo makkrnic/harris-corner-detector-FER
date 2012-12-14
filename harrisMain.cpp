@@ -50,7 +50,7 @@ int main (int argc, char *argv[]) {
   
 
 
-  //points = get_harris_points (img); 
+  points = get_harris_points (img, 10, 0.1); 
 
 
 

@@ -5,49 +5,48 @@ using namespace std;
 
 
 
-int nonzero_t(Mat a, int* coords)
+int nonzero_t(Mat a, std::vector<CvPoint>& coords)
 {
   int k = 0;
 	int i;
 
-	for(int i = 0; i < a.rows; i++)
+	for(i = 0; i < a.rows; i++)
 	{
 		const double* Mi = a.ptr<double>(i);
 		for(int j = 0; j < a.cols; j++)
 		{
 			if (Mi[j]!=0)
 			{
-				coords[k++] = i;
-				coords[k++] = j;
+        coords.push_back (cvPoint(i,j));
+				//coords[k++] = j;
 			}
 		}
 	}
 	return k;
 }
 
-int** zeros(int x, int y, int min_dist)
+void zeros(Mat& allowed_locations, int x, int y, int min_dist)
 {
 	int i;
 	int j;
-	int** myArray;
 	for (i = 0; i < x; ++i)
 	{
 		for (j = 0; j < y; ++j)
 		{
 			if((i>min_dist)&&(i<x-min_dist)&&(j>min_dist)&&(j<y-min_dist))
 			{
-				myArray[i][j] = 1;
+				allowed_locations.at<int>(i,j) = 1;
 			}
 			else
 			{
-				myArray[i][j] = 0;
+				allowed_locations.at<int>(i,j) = 0;
 			}
 		}
 	}
-	return myArray;
+	return;
 }
 
-void prosiri(int** allowed_locations, int x, int y, int min_dist)
+void prosiri(Mat& allowed_locations, int x, int y, int min_dist)
 {
 	int i;
 	int j;
@@ -55,25 +54,25 @@ void prosiri(int** allowed_locations, int x, int y, int min_dist)
 	{
 		for (j = y-min_dist+1; j < y+min_dist; ++j)
 		{
-			allowed_locations = 0;
+			allowed_locations.at<int>(i,j) = 0;
 		}
 	}
 }
 
-list<int> vrijednosna(Mat harrisim, int* coords, int k)
+list<int> vrijednosna(Mat harrisim, std::vector<CvPoint> coords, int k)
 {
 	list<int> povratna;
 	int i;
 
-	for(int i = 0; i < k; i+=2)
+	for(i = 0; i < k; i++)
 	{
-		povratna.push_back(harrisim.at<double>(coords[i],coords[i+1]));
+		povratna.push_back(harrisim.at<double>(coords[i].x, coords[i].y));
 	}
 
 	return povratna;
 }
 
-std::vector<CvPoint> get_harris_points (Mat harrisim, int min_dist=10, float threshold=0.1)
+std::vector<CvPoint> get_harris_points (Mat harrisim, int min_dist, float threshold)
     //""" Return corners from a Harris response image min_dist is the minimum number of pixels separating corners and image boundary. """	
 	{
     std::vector<CvPoint>  filtered_coords;
@@ -82,7 +81,8 @@ std::vector<CvPoint> get_harris_points (Mat harrisim, int min_dist=10, float thr
 	list<int>::iterator i;
     int max;
     float corner_threshold;
-	int* coords;
+	//int * coords;
+    std::vector<CvPoint> coords;
 	int k;
 
 	
@@ -95,7 +95,7 @@ std::vector<CvPoint> get_harris_points (Mat harrisim, int min_dist=10, float thr
 	
 	for(int i = 0; i < harrisim_t.rows; i++)
 	{
-		const double* Mi = harrisim_t.ptr<double>(i);
+		//const double* Mi = harrisim_t.ptr<double>(i);
 		for(int j = 0; j < harrisim_t.cols; j++)
 		{
 			if (harrisim_t.at<double>(i,j)>corner_threshold)
@@ -110,38 +110,42 @@ std::vector<CvPoint> get_harris_points (Mat harrisim, int min_dist=10, float thr
 	}
 
 
+    //coords = (int *) malloc (999999*sizeof(int));
     // get coordinates of candidates
     k = nonzero_t(harrisim_t, coords);
 
     
     // ...and their values
     //candidate_values = [harrisim[c[0],c[1]] for c in coords];
-	candidate_values = vrijednosna(harrisim, coords, k);
+	  candidate_values = vrijednosna(harrisim, coords, k);
     
     // sort candidates
     candidate_values.sort();
 
 
     // store allowed point locations in array
-    int** allowed_locations = zeros(harrisim.rows, harrisim.cols, min_dist);
+    //int *allowed_locations = (int *) malloc (harrisim.rows * harrisim.cols * sizeof(int));//[harrisim.rows][harrisim.cols];
+
+    //matrix<int> allowed_locations(harrisim.rows, harrisim.cols);
+
+    Mat allowed_locations (harrisim.size(), CV_8UC1);
+    zeros(allowed_locations, harrisim.rows, harrisim.cols, min_dist);
 
     //allowed_locations[min_dist:-min_dist,min_dist:-min_dist] = 1;
     
-	int b=-1;
+	  int b=-1;
     // select the best points taking min_distance into account
     for (i=candidate_values.begin(); i!=candidate_values.end(); i++)
     {
-		b++;
-        if (allowed_locations[coords[b]][coords[b+1]] == 1)
-		{
+		  b++;
+      if (allowed_locations.at<int> (coords[b].x, coords[b].y) == 1)
+		  {
 			// filtered_coords.push_back (coords[b]);
 			// filtered_coords.push_back (coords[b+1]);
-      CvPoint tmpPoint = {coords[b], coords[b+1]};
-      filtered_coords.push_back(tmpPoint);
-			prosiri (allowed_locations, coords[b], coords[b+1], min_dist);
-            //allowed_locations[(coords[*i,0]-min_dist):(coords[*i,0]+min_dist),
-            //(coords[*i,1]-min_dist):(coords[*i,1]+min_dist)] = 0
-		}
+        CvPoint tmpPoint = coords[b]; //{coords[b], coords[b+1]};
+        filtered_coords.push_back(tmpPoint);
+			  prosiri (allowed_locations, coords[b].x, coords[b].y, min_dist);
+		  }
     }
-    return filtered_coords;
-    }
+  return filtered_coords;
+}
