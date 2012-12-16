@@ -3,149 +3,101 @@
 using namespace cv;
 using namespace std;
 
+class HarrisPointValue {
+public:
+    HarrisPointValue(Point p, double val);
+    Point point;
+    double value;
+};
 
-
-int nonzero_t(Mat a, std::vector<CvPoint>& coords)
-{
-  int k = 0;
-	int i;
-
-	for(i = 0; i < a.rows; i++)
-	{
-		const double* Mi = a.ptr<double>(i);
-		for(int j = 0; j < a.cols; j++)
-		{
-			if (Mi[j]!=0)
-			{
-        coords.push_back (cvPoint(i,j));
-				//coords[k++] = j;
-			}
-		}
-	}
-	return k;
+HarrisPointValue::HarrisPointValue(Point p, double val) {
+    point = p;
+    value = val;
 }
 
-void zeros(Mat& allowed_locations, int x, int y, int min_dist)
-{
-	int i;
-	int j;
-	for (i = 0; i < x; ++i)
-	{
-		for (j = 0; j < y; ++j)
-		{
-			if((i>min_dist)&&(i<x-min_dist)&&(j>min_dist)&&(j<y-min_dist))
-			{
-				allowed_locations.at<int>(i,j) = 1;
-			}
-			else
-			{
-				allowed_locations.at<int>(i,j) = 0;
-			}
-		}
-	}
-	return;
+void nonzero_t(Mat harrisim_t, list<Point> &coords) {
+//    int num = countNonZero(harrisim_t);
+
+    for(int i = 0; i < harrisim_t.rows; i++) {
+        for(int j = 0; j < harrisim_t.cols; j++) {
+            if ((int)harrisim_t.at<uchar>(i, j) != 0) {
+                coords.push_back(Point(i, j));
+            }
+        }
+    }
+    return ;
 }
 
-void prosiri(Mat& allowed_locations, int x, int y, int min_dist)
-{
-	int i;
-	int j;
-	for (i = x-min_dist+1; i < x+min_dist; ++i)
-	{
-		for (j = y-min_dist+1; j < y+min_dist; ++j)
-		{
-			allowed_locations.at<int>(i,j) = 0;
-		}
-	}
+void vrijednosna(Mat harrisim, list<Point> &coords, list<HarrisPointValue> &candidate_values) {
+    for(list<Point>::iterator it = coords.begin(); it != coords.end(); ++it) {
+        candidate_values.push_back(HarrisPointValue(*it, harrisim.at<double>(*it)));
+    }
+
+    return ;
 }
 
-list<int> vrijednosna(Mat harrisim, std::vector<CvPoint> coords, int k)
-{
-	list<int> povratna;
-	int i;
+bool compareValue(HarrisPointValue first, HarrisPointValue second) {
+    if(first.value > second.value) {
+        return true;
+    }
 
-	for(i = 0; i < k; i++)
-	{
-		povratna.push_back(harrisim.at<double>(coords[i].x, coords[i].y));
-	}
-
-	return povratna;
+    return false;
 }
 
-std::vector<CvPoint> get_harris_points (Mat harrisim, int min_dist, float threshold)
-    //""" Return corners from a Harris response image min_dist is the minimum number of pixels separating corners and image boundary. """	
-	{
-    std::vector<CvPoint>  filtered_coords;
-    Mat harrisim_t=Mat();
-	list<int> candidate_values;
-	list<int>::iterator i;
-    int max;
-    float corner_threshold;
-	//int * coords;
-    std::vector<CvPoint> coords;
-	int k;
+bool checkMask(Mat &mask, Point point, int min_dist) {
+    if(mask.at<uchar>(point) == 0) {
+        return false;
+    }
+    else {
+        for (int i = point.x - min_dist + 1; i < point.x + min_dist; ++i) {
+            for( int j = point.y - min_dist + 1; j < point.y + min_dist; ++j ) {
+                mask.at<uchar>(i, j) = 0; 
+        }
+    }
+        return true;
+    }
+}
 
-	
-	harrisim_t = harrisim.clone();
+list<Point> get_harris_points (Mat harrisim, int min_dist, float thresh) {
+//""" Return corners from a Harris response image min_dist is the minimum number of pixels separating corners and image boundary. """
+
+    list<Point> coords, filtered_coords;
+    Mat harrisim_t = Mat(harrisim.size(), CV_8UC1, Scalar::all(0));
+    list<HarrisPointValue> candidate_values;
+
     // find top corner candidates above a threshold
-	MatConstIterator_<double> it = harrisim.begin<double>(), it_end = harrisim.end<double>();
-	max = *max_element(it, it_end);    
-    corner_threshold = max * threshold;
-   
-	
-	for(int i = 0; i < harrisim_t.rows; i++)
-	{
-		//const double* Mi = harrisim_t.ptr<double>(i);
-		for(int j = 0; j < harrisim_t.cols; j++)
-		{
-			if (harrisim_t.at<double>(i,j)>corner_threshold)
-			{
-				harrisim_t.at<double>(i,j)=1;
-			}
-			else
-			{
-				harrisim_t.at<double>(i,j)=0;
-			}
-		}
-	}
+    double max;
+    // finds the max value
+    minMaxLoc(harrisim, NULL, &max);
+    double corner_threshold = max * thresh;
 
+    // thresholding of corners - sets everything above threshold to 255, and below to 0
+    threshold(harrisim, harrisim_t, corner_threshold, 255, THRESH_BINARY);
 
-    //coords = (int *) malloc (999999*sizeof(int));
     // get coordinates of candidates
-    k = nonzero_t(harrisim_t, coords);
+    nonzero_t(harrisim_t, coords);
 
-    
     // ...and their values
-    //candidate_values = [harrisim[c[0],c[1]] for c in coords];
-	  candidate_values = vrijednosna(harrisim, coords, k);
-    
-    // sort candidates
-    candidate_values.sort();
+    vrijednosna(harrisim, coords, candidate_values);
 
+    // sort candidates
+    candidate_values.sort(compareValue);
 
     // store allowed point locations in array
-    //int *allowed_locations = (int *) malloc (harrisim.rows * harrisim.cols * sizeof(int));//[harrisim.rows][harrisim.cols];
-
-    //matrix<int> allowed_locations(harrisim.rows, harrisim.cols);
-
-    Mat allowed_locations (harrisim.size(), CV_8UC1);
-    zeros(allowed_locations, harrisim.rows, harrisim.cols, min_dist);
-
-    //allowed_locations[min_dist:-min_dist,min_dist:-min_dist] = 1;
-    
-	  int b=-1;
-    // select the best points taking min_distance into account
-    for (i=candidate_values.begin(); i!=candidate_values.end(); i++)
-    {
-		  b++;
-      if (allowed_locations.at<int> (coords[b].x, coords[b].y) == 1)
-		  {
-			// filtered_coords.push_back (coords[b]);
-			// filtered_coords.push_back (coords[b+1]);
-        CvPoint tmpPoint = coords[b]; //{coords[b], coords[b+1]};
-        filtered_coords.push_back(tmpPoint);
-			  prosiri (allowed_locations, coords[b].x, coords[b].y, min_dist);
-		  }
+    Mat mask = Mat(harrisim.size(), CV_8UC1, Scalar::all(255));
+    for( int i = 0; i < min_dist; ++i ) {
+        mask.row(i).setTo(Scalar(0));
+        mask.row(mask.rows-i-1).setTo(Scalar(0));
+        mask.col(i).setTo(Scalar(0));
+        mask.col(mask.cols-i-1).setTo(Scalar(0));
     }
-  return filtered_coords;
+
+    list<HarrisPointValue>::iterator iter;
+    // select the best points taking min_distance into account
+    for (iter = candidate_values.begin(); iter != candidate_values.end(); ++iter) {
+        if (checkMask(mask, iter->point, min_dist)) {
+            filtered_coords.push_back(Point(iter->point));
+        }
+    }
+    return filtered_coords;
 }
