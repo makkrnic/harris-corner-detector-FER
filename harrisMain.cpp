@@ -3,6 +3,7 @@
 #include <highgui.h>
 #include <cxcore.h>
 #include <vector>
+#include <getopt.h>
 
 #include "gaussian.h"
 #include "get_harris_points.hpp"
