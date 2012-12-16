@@ -11,8 +11,8 @@
 
 int main (int argc, char *argv[]) {
   Mat img, imgBlurred;
-  std::vector<CvPoint> points;
-  CvPoint tmpPoint;
+  std::list<Point> points;
+  Point tmpPoint;
 
   char usage[] = "-i ime_slike";
   char opt;
