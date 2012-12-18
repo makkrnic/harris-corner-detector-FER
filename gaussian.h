@@ -3,4 +3,4 @@
 #include <cmath>
 #include <iostream>
 
-void grayscaleGaussianBlur(cv::Mat source, cv::Mat destination, int sizeX, int sizeY = -1);
+void grayscaleGaussianBlur(cv::Mat &source, cv::Mat &destination, int sizeX, int sizeY = -1);
