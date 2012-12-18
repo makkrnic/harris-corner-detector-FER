@@ -3,6 +3,6 @@
 
 using namespace cv;
 
-void plotHarrisPoints (Mat image, std::vector<CvPoint>& filtered_coords);
+void plotHarrisPoints (Mat image, std::list<Point>& filtered_coords);
 
 #endif
