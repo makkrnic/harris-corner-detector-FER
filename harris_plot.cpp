@@ -19,7 +19,7 @@ void plotHarrisPoints (Mat imageMat, std::list<Point>& filtered_coords) {
   for (std::list<Point>::iterator point = filtered_coords.begin();
         point != filtered_coords.end(); ++point) {
     // Dodaj svaku tocku na sliku koja ce se prikazati.
-    cvCircle (imgColored, *point, 5, pointColor, CV_FILLED);
+    cvCircle (imgColored, *point, 3, pointColor, CV_FILLED);
   }
   
   cvNamedWindow ("HarrisPoints", CV_WINDOW_NORMAL | CV_WINDOW_KEEPRATIO | CV_GUI_NORMAL);
