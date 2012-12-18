@@ -1,9 +1,10 @@
 #include <cv.h>
 #include <highgui.h>
+#include <list>
 
 #include "harris.hpp"
 
-void plotHarrisPoints (Mat imageMat, std::vector<CvPoint>& filtered_coords) {
+void plotHarrisPoints (Mat imageMat, std::list<Point>& filtered_coords) {
   //CvSize imSize = cvSize (image->width, image->height);
   IplImage image = imageMat;
   CvSize imSize = imageMat.size();
@@ -15,7 +16,7 @@ void plotHarrisPoints (Mat imageMat, std::vector<CvPoint>& filtered_coords) {
   // crvena boja. Iz nekog razloga je BGR umjesto RGB.
   CvScalar pointColor = cvScalar (0, 0, 255);
 
-  for (std::vector<CvPoint>::iterator point = filtered_coords.begin();
+  for (std::list<Point>::iterator point = filtered_coords.begin();
         point != filtered_coords.end(); ++point) {
     // Dodaj svaku tocku na sliku koja ce se prikazati.
     cvCircle (imgColored, *point, 5, pointColor, CV_FILLED);
