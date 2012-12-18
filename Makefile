@@ -4,7 +4,7 @@ CC				  = g++
 CFLAGS			= -c -g -Wall -std=c++0x
 LDFLAGS			= 
 
-SOURCES  		= harris.cpp harrisMain.cpp gaussian.cpp get_harris_points.cpp
+SOURCES  		= harris_plot.cpp harrisMain.cpp gaussian.cpp get_harris_points.cpp
 OBJECTS 		= ${SOURCES:.cpp=.o}
 
 EXECUTABLE	= harrisDetector

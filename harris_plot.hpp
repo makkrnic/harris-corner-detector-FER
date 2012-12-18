@@ -1,5 +1,5 @@
-#ifndef _HARRIS_HPP
-#define _HARRIS_HPP
+#ifndef _HARRIS_PLOT_HPP
+#define _HARRIS_PLOT_HPP
 
 using namespace cv;
 

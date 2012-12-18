@@ -2,7 +2,7 @@
 #include <highgui.h>
 #include <list>
 
-#include "harris.hpp"
+#include "harris_plot.hpp"
 
 void plotHarrisPoints (Mat imageMat, std::list<Point>& filtered_coords) {
   //CvSize imSize = cvSize (image->width, image->height);

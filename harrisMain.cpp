@@ -7,7 +7,7 @@
 
 #include "gaussian.h"
 #include "get_harris_points.hpp"
-#include "harris.hpp"
+#include "harris_plot.hpp"
 
 int main (int argc, char *argv[]) {
   Mat img, imgBlurred;
