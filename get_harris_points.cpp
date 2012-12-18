@@ -15,7 +15,7 @@ HarrisPointValue::HarrisPointValue(Point p, double val) {
     value = val;
 }
 
-void nonzero_t(Mat harrisim_t, list<Point> &coords) {
+void nonzero_t(Mat &harrisim_t, list<Point> &coords) {
 //    int num = countNonZero(harrisim_t);
 
     for(int i = 0; i < harrisim_t.rows; i++) {
@@ -28,7 +28,7 @@ void nonzero_t(Mat harrisim_t, list<Point> &coords) {
     return ;
 }
 
-void vrijednosna(Mat harrisim, list<Point> &coords, list<HarrisPointValue> &candidate_values) {
+void vrijednosna(Mat &harrisim, list<Point> &coords, list<HarrisPointValue> &candidate_values) {
     for(list<Point>::iterator it = coords.begin(); it != coords.end(); ++it) {
         candidate_values.push_back(HarrisPointValue(*it, harrisim.at<double>(*it)));
     }
@@ -36,7 +36,7 @@ void vrijednosna(Mat harrisim, list<Point> &coords, list<HarrisPointValue> &cand
     return ;
 }
 
-bool compareValue(HarrisPointValue first, HarrisPointValue second) {
+bool compareValue(HarrisPointValue &first, HarrisPointValue &second) {
     if(first.value > second.value) {
         return true;
     }
@@ -58,7 +58,7 @@ bool checkMask(Mat &mask, Point point, int min_dist) {
     }
 }
 
-list<Point> get_harris_points (Mat harrisim, int min_dist, float thresh) {
+list<Point> get_harris_points (Mat &harrisim, int min_dist, float thresh) {
 //""" Return corners from a Harris response image min_dist is the minimum number of pixels separating corners and image boundary. """
 
     list<Point> coords, filtered_coords;
