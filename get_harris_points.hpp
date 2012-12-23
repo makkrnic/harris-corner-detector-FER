@@ -14,5 +14,5 @@
 using namespace cv;
 using namespace std;
 
-list<Point> get_harris_points (Mat harrisim, int min_dist = 10, float thresh = 0.1);
+list<Point> get_harris_points (Mat &harrisim, int min_dist = 10, float thresh = 0.1);
 #endif
