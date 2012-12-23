@@ -58,6 +58,22 @@ bool checkMask(Mat &mask, Point point, int min_dist) {
     }
 }
 
+void thresholdMat(Mat &src, Mat &dest, double thresh, int high) {
+    CV_Assert(src.size() == dest.size());
+    for (int i = 0; i < src.rows; ++i) {
+        for( int j = 0; j < src.cols; ++j ) {
+            if(src.at<double>(i, j) >= thresh) {
+                dest.at<uchar>(i, j) = high;
+            }
+            else {
+                dest.at<uchar>(i, j) = 0;
+            }
+        }
+    }
+
+    return ;
+}
+
 list<Point> get_harris_points (Mat &harrisim, int min_dist, float thresh) {
 //""" Return corners from a Harris response image min_dist is the minimum number of pixels separating corners and image boundary. """
 
@@ -72,13 +88,15 @@ list<Point> get_harris_points (Mat &harrisim, int min_dist, float thresh) {
     double corner_threshold = max * thresh;
 
     // thresholding of corners - sets everything above threshold to 255, and below to 0
-    threshold(harrisim, harrisim_t, corner_threshold, 255, THRESH_BINARY);
+    thresholdMat(harrisim, harrisim_t, corner_threshold, 255);
 
     // get coordinates of candidates
     nonzero_t(harrisim_t, coords);
 
     // ...and their values
     vrijednosna(harrisim, coords, candidate_values);
+
+    cout << "Kandidati: " << candidate_values.size() << endl;
 
     // sort candidates
     candidate_values.sort(compareValue);
@@ -95,9 +113,11 @@ list<Point> get_harris_points (Mat &harrisim, int min_dist, float thresh) {
     list<HarrisPointValue>::iterator iter;
     // select the best points taking min_distance into account
     for (iter = candidate_values.begin(); iter != candidate_values.end(); ++iter) {
+//        cout << " " << iter->point.x << ", " << iter->point.y << endl;
         if (checkMask(mask, iter->point, min_dist)) {
             filtered_coords.push_back(Point(iter->point));
         }
     }
+    cout << "Kutevi: " << filtered_coords.size() << endl;
     return filtered_coords;
 }
