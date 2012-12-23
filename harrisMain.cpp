@@ -14,11 +14,12 @@ int main (int argc, char *argv[]) {
   std::list<Point> points;
   Point tmpPoint;
 
-  char usage[] = "[-s] -i ime_slike";
+  char usage[] = "[-s] [-k kernel_size] -i ime_slike";
   char opt;
-  char optstring[] = "si:";
+  char optstring[] = "si:k:";
   char *imgName = NULL;
   bool disableBlur = false;
+  char kernelSize = 3;
 
   if (argc < 2) {
     fprintf (stderr, "Upotreba: %s %s\n", argv[0], usage);
@@ -33,6 +34,10 @@ int main (int argc, char *argv[]) {
 
       case 's':
         disableBlur = true;
+      break;
+
+      case 'k':
+        kernelSize = atoi(optarg)/2 * 2 + 1;
       break;
 
       default:
@@ -62,7 +67,7 @@ int main (int argc, char *argv[]) {
   }
   else {
     // Prvo treba zagladiti sliku:
-    grayscaleGaussianBlur (img, imgBlurred, 11);
+    grayscaleGaussianBlur (img, imgBlurred, kernelSize, kernelSize);
   }
   
 
