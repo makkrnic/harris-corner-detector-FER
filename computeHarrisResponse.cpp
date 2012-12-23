@@ -23,7 +23,7 @@ void computeHarrisResponse(Mat &src, Mat &dest) {
       int ksize = 3; //ovo je velicina prozora za sobel funkciju...tipa 3x3
       int wsize = 1;
 
-      // provjeriti assertovima dimenzije i broj kanala
+      // TODO: provjeriti assertovima dimenzije i broj kanala
 
       Mat blurred = Mat(src.size(), CV_8UC1, Scalar::all(0));
       grayscaleGaussianBlur(src, blurred, 11);
@@ -35,17 +35,21 @@ void computeHarrisResponse(Mat &src, Mat &dest) {
       Mat dx = Mat(derivX.size(), CV_8UC1);
       Mat dy = Mat(derivY.size(), CV_8UC1);
 
+      // apsolutna vrijednost, tak sam vidio na primjeru u službenoj dokuemntaciji
       convertScaleAbs(derivX, dx);
       convertScaleAbs(derivY, dy);
 
+      // opet blur da se riješimo noise-a
       grayscaleGaussianBlur(dx, dx, 5);
       grayscaleGaussianBlur(dy, dy, 5);
 
+      // stvaram float matrice da izbjegnem overflow kod množenja
       Mat Ixx = Mat(src.size(), CV_32F);
       Mat Ixy = Mat(src.size(), CV_32F);
       Mat Iyy = Mat(src.size(), CV_32F);
 
-      Ixx = dx.mul(dx); //tu mnozim medusobno da dobijem Ix^2, Ixy i Iy^2
+      // ovaj dio mi je sumnjiv, iako je u teriji dobro
+      Ixx = dx.mul(dx);
       Ixy = dx.mul(dy);
       Iyy = dy.mul(dy);
 
