@@ -14,10 +14,11 @@ int main (int argc, char *argv[]) {
   std::list<Point> points;
   Point tmpPoint;
 
-  char usage[] = "-i ime_slike";
+  char usage[] = "[-s] -i ime_slike";
   char opt;
-  char optstring[] = "i:";
-  char *imgName;
+  char optstring[] = "si:";
+  char *imgName = NULL;
+  bool disableBlur = false;
 
   if (argc < 2) {
     fprintf (stderr, "Upotreba: %s %s\n", argv[0], usage);
@@ -30,11 +31,20 @@ int main (int argc, char *argv[]) {
         imgName = optarg;
       break;
 
+      case 's':
+        disableBlur = true;
+      break;
+
       default:
         fprintf (stderr, "Nepodrzana opcija.\n");
         fprintf (stderr, "Upotreba: %s %s\n", argv[0], usage);
         return 1;
     }
+  }
+
+  if (imgName == NULL) {
+    fprintf (stderr, "Upotreba: %s %s\n", argv[0], usage);
+    return 1;
   }
 
   //if ((img = cvLoadImage (imgName, CV_LOAD_IMAGE_GRAYSCALE)) == NULL) {
@@ -46,12 +56,18 @@ int main (int argc, char *argv[]) {
 
   
   imgBlurred = Mat (img.size(), CV_8UC1, Scalar::all(0));
-  // Prvo treba zagladiti sliku:
-  grayscaleGaussianBlur (img, imgBlurred, 11);
+
+  if (disableBlur == true) {
+    imgBlurred = img;
+  }
+  else {
+    // Prvo treba zagladiti sliku:
+    grayscaleGaussianBlur (img, imgBlurred, 11);
+  }
   
 
 
-  points = get_harris_points (img, 10, 0.1); 
+  points = get_harris_points (imgBlurred, 10, 0.1); 
 
 
 
