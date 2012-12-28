@@ -1,6 +1,10 @@
+#!/usr/bin/env python2
+
 from pylab import *
 from numpy import *
+from PIL import Image
 from scipy.ndimage import filters
+import sys
 
 
 def compute_harris_response(im,sigma=3):
@@ -170,3 +174,9 @@ def upari(im1,im2,sigma,wid):
     gray()
     plot_matches(im1,im2,filtered_coords1,filtered_coords2,matches)
     show()
+
+if __name__ == '__main__':
+  im = array(Image.open(sys.argv[1]).convert('L'))
+  (harrisim,_,_) = compute_harris_response(im)
+  filtered = get_harris_points (harrisim, 6)
+  plot_harris_points (im, filtered)

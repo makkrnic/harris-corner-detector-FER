@@ -8,9 +8,10 @@
 #include "gaussian.h"
 #include "get_harris_points.hpp"
 #include "harris_plot.hpp"
+#include "computeHarrisResponse.h"
 
 int main (int argc, char *argv[]) {
-  Mat img, imgBlurred;
+  Mat img, harrisResponse, imgBlurred;
   std::list<Point> points;
   Point tmpPoint;
 
@@ -22,7 +23,7 @@ int main (int argc, char *argv[]) {
   unsigned char kernelSize = 3;
 
   if (argc < 2) {
-    fprintf (stderr, "Upotreba: %s %s\n", argv[0], usage);
+      fprintf (stderr, "Upotreba: %s %s\n", argv[0], usage);
     return 1;
   }
 
@@ -48,16 +49,10 @@ int main (int argc, char *argv[]) {
     }
   }
 
-  if (imgName == NULL) {
-    fprintf (stderr, "Upotreba: %s %s\n", argv[0], usage);
-    return 1;
-  }
-
-  //if ((img = cvLoadImage (imgName, CV_LOAD_IMAGE_GRAYSCALE)) == NULL) {
   img = imread (imgName, CV_LOAD_IMAGE_GRAYSCALE);
   if (img.empty()) {
-    fprintf (stderr, "Greska pri citanju fajla.\n");
-    return 2;
+      cerr << "Greska pri citanju fajla.\n" << endl;
+      return 2;
   }
 
   
@@ -71,19 +66,11 @@ int main (int argc, char *argv[]) {
     grayscaleGaussianBlur (img, imgBlurred, kernelSize, kernelSize);
   }
   
+  computeHarrisResponse(imgBlurred, harrisResponse);
 
+  points = get_harris_points (harrisResponse, 10, 0.1); 
 
-  points = get_harris_points (imgBlurred, 10, 0.1); 
-
-
-
-  // Testni podaci
-  tmpPoint.x = 300;
-  tmpPoint.y = 300;
-
-  points.push_back (tmpPoint);
-
-  plotHarrisPoints (imgBlurred, points);
+  plotHarrisPoints (img, points);
 
   return 0;
 }
