@@ -26,7 +26,7 @@ void plotHarrisPoints (Mat imageMat, std::list<Point>& filtered_coords) {
   cvResizeWindow ("HarrisPoints", imSize.width, imSize.height);
 
   cvShowImage ("HarrisPoints", imgColored);
-  cvWaitKey ();
+  while (cvWaitKey (0) != 0x10001B);
   cvDestroyWindow ("HarrisPoints");
 
   cvReleaseImage (&imgColored);
