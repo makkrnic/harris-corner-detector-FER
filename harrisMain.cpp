@@ -10,6 +10,22 @@
 #include "harris_plot.hpp"
 #include "computeHarrisResponse.h"
 
+void debug_saveResponse (Mat harrisResponse) {
+  FILE *fo = NULL;
+  char fname[] = "harrisResponseDebugC++";
+
+  fo = fopen (fname, "w");
+
+
+  for(int row = 0; row < harrisResponse.rows; ++row) {
+    uchar* p = harrisResponse.ptr(row);
+    for(int col = 0; col < harrisResponse.cols; ++col) {
+      fprintf (fo, "%d\n", *p);
+      *p++;  //points to each pixel value in turn assuming a CV_8UC1 greyscale image 
+    }
+  }   
+}
+
 int main (int argc, char *argv[]) {
   Mat img, harrisResponse, imgBlurred;
   std::list<Point> points;
@@ -67,6 +83,8 @@ int main (int argc, char *argv[]) {
   }
   
   computeHarrisResponse(imgBlurred, harrisResponse);
+
+  debug_saveResponse (harrisResponse);
 
   points = get_harris_points (harrisResponse, 10, 0.1); 
 

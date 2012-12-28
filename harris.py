@@ -178,5 +178,16 @@ def upari(im1,im2,sigma,wid):
 if __name__ == '__main__':
   im = array(Image.open(sys.argv[1]).convert('L'))
   (harrisim,_,_) = compute_harris_response(im)
+  
+  
+  dbgfile = open('harrisResponseDebugPython', 'w+')
+  for r in harrisim:
+    for e in r:
+      #print e
+      dbgfile.write (str(e) + '\n')
+  
+  dbgfile.close()
+
+
   filtered = get_harris_points (harrisim, 6)
   plot_harris_points (im, filtered)

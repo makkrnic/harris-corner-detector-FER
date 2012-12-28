@@ -15,7 +15,6 @@ inline double getElement(Mat &matrix, int i, int j) {
 }
 
 void computeHarrisResponse(Mat &src, Mat &dest) {
-
       int scale = 1;
       int delta = 0;
       int ddepth = CV_16S;
