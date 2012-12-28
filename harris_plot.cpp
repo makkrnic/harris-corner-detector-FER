@@ -22,7 +22,7 @@ void plotHarrisPoints (Mat imageMat, std::list<Point>& filtered_coords) {
     cvCircle (imgColored, *point, 3, pointColor, CV_FILLED);
   }
   
-  cvNamedWindow ("HarrisPoints", CV_WINDOW_NORMAL | CV_WINDOW_KEEPRATIO | CV_GUI_NORMAL);
+  cvNamedWindow ("HarrisPoints");
   cvResizeWindow ("HarrisPoints", imSize.width, imSize.height);
 
   cvShowImage ("HarrisPoints", imgColored);

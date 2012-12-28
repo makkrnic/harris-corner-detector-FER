@@ -19,7 +19,7 @@ int main (int argc, char *argv[]) {
   char optstring[] = "si:k:";
   char *imgName = NULL;
   bool disableBlur = false;
-  char kernelSize = 3;
+  unsigned char kernelSize = 3;
 
   if (argc < 2) {
     fprintf (stderr, "Upotreba: %s %s\n", argv[0], usage);
@@ -38,6 +38,7 @@ int main (int argc, char *argv[]) {
 
       case 'k':
         kernelSize = atoi(optarg)/2 * 2 + 1;
+        assert (kernelSize > 2);
       break;
 
       default:
