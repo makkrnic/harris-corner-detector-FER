@@ -107,7 +107,7 @@ int main (int argc, char *argv[]) {
     grayscaleGaussianBlur (img, imgBlurred, kernelSize, kernelSize);
   }
 
-  harrisResponse = Mat (img.size(), CV_16U);
+  harrisResponse = Mat (img.size(), CV_64F);
 
   
   computeHarrisResponse(imgBlurred, harrisResponse);
@@ -123,7 +123,7 @@ int main (int argc, char *argv[]) {
   
   imshow ("harrisResponse", harrisResponse);
 
-  points = get_harris_points (harrisResponse, 10, 0.1); 
+  points = get_harris_points (harrisResponse, 5, 0.1);
 
   plotHarrisPoints (img, points);
 
