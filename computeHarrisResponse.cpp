@@ -60,12 +60,12 @@ void calculate_ygrad (int w, int h, unsigned char *src, unsigned char * dst) {
  * matricu dest.
  * dest treba biti alocirana.
  */
-void emul (int w, int h, unsigned char *m1, unsigned char *m2, ushort *dest) {
+void emul (int w, int h, unsigned char *m1, unsigned char *m2, unsigned char *dest) {
   int x, y = 0;
 
   for (y = 0; y < h; y++) {
     for (x = 0; x < w; x++) {
-      dest[y * w + x] = (ushort)m1[y * w + x] * (ushort)m2[y * w + x];
+      dest[y * w + x] = (unsigned char)(((ushort)m1[y * w + x] * (ushort)m2[y * w + x])/65535.0 * 255);
     }
   }
 }
@@ -97,14 +97,14 @@ void computeHarrisResponse(Mat &src, Mat &dest) {
   compatMat_YGrad.data = yGrad;
   //imshow ("Ygrad", compatMat_YGrad);
 
-  //grayscaleGaussianBlur (compatMat_XGrad, compatMat_XGrad, 5);
-  //grayscaleGaussianBlur (compatMat_YGrad, compatMat_YGrad, 5);
+  grayscaleGaussianBlur (compatMat_XGrad, compatMat_XGrad, 5);
+  grayscaleGaussianBlur (compatMat_YGrad, compatMat_YGrad, 5);
 
 
 
-  ushort *Ixx = (ushort *) malloc (numPixels * sizeof (ushort));
-  ushort *Ixy = (ushort *) malloc (numPixels * sizeof (ushort));
-  ushort *Iyy = (ushort *) malloc (numPixels * sizeof (ushort));
+  unsigned char *Ixx = (unsigned char *) malloc (numPixels * sizeof (unsigned char));
+  unsigned char *Ixy = (unsigned char *) malloc (numPixels * sizeof (unsigned char));
+  unsigned char *Iyy = (unsigned char *) malloc (numPixels * sizeof (unsigned char));
   
   
   emul (imgSize.width, imgSize.height, xGrad, xGrad, Ixx);
@@ -113,9 +113,9 @@ void computeHarrisResponse(Mat &src, Mat &dest) {
 
 
 
-  //Mat compatMat_Ixx = Mat (imgSize, CV_16U);
-  //compatMat_Ixx.data = (uchar *)Ixx;
-  //imshow ("Ixx", compatMat_Ixx);
+  Mat compatMat_Ixx = Mat (imgSize, CV_8UC1);
+  compatMat_Ixx.data = (uchar *)Ixx;
+  imshow ("Ixx", compatMat_Ixx);
   //cvNamedWindow ("Ixx");
   //imshow("Ixx", compatMat_Ixx);
   //while (cvWaitKey (0) != 0x10001B);
@@ -130,33 +130,43 @@ void computeHarrisResponse(Mat &src, Mat &dest) {
 
 
   
-  Mat compatMat_Ixy = Mat (imgSize, CV_16U);
+  Mat compatMat_Ixy = Mat (imgSize, CV_8UC1);
   compatMat_Ixy.data = (uchar *)Ixy;
   imshow ("Ixy", compatMat_Ixy);
 
-//  Mat compatMat_Iyy = Mat (imgSize, CV_16U);
-//  compatMat_Iyy.data = (uchar *)Iyy;
-//  imshow ("Iyy", compatMat_Iyy);
+  Mat compatMat_Iyy = Mat (imgSize, CV_8UC1);
+  compatMat_Iyy.data = (uchar *)Iyy;
+  imshow ("Iyy", compatMat_Iyy);
+
+  grayscaleGaussianBlur (compatMat_Ixx, compatMat_Ixx, 5);
+  grayscaleGaussianBlur (compatMat_Iyy, compatMat_Iyy, 5);
+  grayscaleGaussianBlur (compatMat_Ixy, compatMat_Ixy, 5);
 
 
   
-//  double *harrisResponse = (double *) malloc (numPixels * sizeof (double));
-//
-//  for (int y = 0; y < imgSize.height; y++) {
-//    for (int x = 0; x < imgSize.width; x++) {
-//      double det = Ixx[imgSize.width * y + x] * Iyy[imgSize.width * y + x] - Ixy[imgSize.width * y + x] * Ixy[imgSize.width * y + x];
-//      double trace = Ixx[imgSize.width * y + x] + Iyy[imgSize.width * y + x];
-//
-//      harrisResponse[imgSize.width * y + x] = det - 0.06 * trace * trace;
-//    }
-//  }
+  double *harrisResponse = (double *) malloc (numPixels * sizeof (double));
+
+  for (int y = 0; y < imgSize.height; y++) {
+    for (int x = 0; x < imgSize.width; x++) {
+      double det = (int)Ixx[imgSize.width * y + x] * (int)Iyy[imgSize.width * y + x] - (int)Ixy[imgSize.width * y + x] * (int)Ixy[imgSize.width * y + x];
+      double trace = (int)Ixx[imgSize.width * y + x] + (int)Iyy[imgSize.width * y + x];
+      if (det != 0) {
+        printf ("\n\n\nDet nije 0\n\n\n");
+      }
+
+      harrisResponse[imgSize.width * y + x] = det - 0.06 * (double)trace * (double)trace;
+    }
+  }
 
 
-  //Mat compatMat_resp = Mat (imgSize, CV_64F);
-  //compatMat_resp.data = (uchar *)Ixy;
-  dest.data = (uchar *)Ixy;
-  //imshow ("response", compatMat_resp);
+  Mat compatMat_resp = Mat (imgSize, CV_64F);
+  compatMat_resp.data = (uchar *)harrisResponse;
+  //dest.data = (uchar *)Ixy;
+  imshow ("response", compatMat_resp);
+
+  memcpy (dest.data, harrisResponse, sizeof (double) * numPixels);
 
 
+  
   return;
 }
