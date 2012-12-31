@@ -81,10 +81,22 @@ int main (int argc, char *argv[]) {
     // Prvo treba zagladiti sliku:
     grayscaleGaussianBlur (img, imgBlurred, kernelSize, kernelSize);
   }
+
+  harrisResponse = Mat (img.size(), CV_16U);
+
   
   computeHarrisResponse(imgBlurred, harrisResponse);
 
-  debug_saveResponse (harrisResponse);
+  //debug_saveResponse (harrisResponse);
+  //debug_loadResponse (harrisResponse);
+  
+  // for(int row = 0; row < harrisResponse.rows; ++row) {
+  //   for(int col = 0; col < harrisResponse.cols; ++col) {
+  //     fprintf (stderr, "Element: %f\n", harrisResponse.at<int>(row,col));
+  //   }
+  // }   
+  
+  imshow ("harrisResponse", harrisResponse);
 
   points = get_harris_points (harrisResponse, 10, 0.1); 
 
