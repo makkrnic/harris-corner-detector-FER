@@ -15,10 +15,12 @@ void plotHarrisPoints (Mat imageMat, std::list<Point>& filtered_coords) {
 
   // crvena boja. Iz nekog razloga je BGR umjesto RGB.
   CvScalar pointColor = cvScalar (0, 0, 255);
+  fprintf (stderr, "\nBroj tocaka: %d\n", filtered_coords.size());
 
   for (std::list<Point>::iterator point = filtered_coords.begin();
         point != filtered_coords.end(); ++point) {
     // Dodaj svaku tocku na sliku koja ce se prikazati.
+    //fprintf (stderr, "Dodajem tocku: (%d, %d)\n", point->x, point->y);
     cvCircle (imgColored, *point, 3, pointColor, CV_FILLED);
   }
   
