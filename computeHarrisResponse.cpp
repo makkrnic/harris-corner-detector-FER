@@ -4,16 +4,6 @@
 using namespace cv;
 using namespace std;
 
-inline double getElement(Mat &matrix, int i, int j) {
-//    assert(matrix.type() == CV_8UC1);
-    if (i < 0 || i >= matrix.rows || j < 0 || j >= matrix.cols) {
-        return 0.0;
-    }
-    else {
-        return matrix.at<double>(i, j);
-    }
-}
-
 void calculate_xgrad (int w, int h, unsigned char *src, unsigned char * dst) {
   int x,y, sum;
 
@@ -64,11 +54,28 @@ void calculate_ygrad (int w, int h, unsigned char *src, unsigned char * dst) {
   }
 }
 
+/**
+ * Uzima matrice m1 i m2, velicine w*h, mnozi odgovarajuce elemente:
+ * (0,0) * (0,0); (0,1) * (0,1)... i sprema ih u 
+ * matricu dest.
+ * dest treba biti alocirana.
+ */
+void emul (int w, int h, unsigned char *m1, unsigned char *m2, ushort *dest) {
+  int x, y = 0;
+
+  for (y = 0; y < h; y++) {
+    for (x = 0; x < w; x++) {
+      dest[y * w + x] = (ushort)m1[y * w + x] * (ushort)m2[y * w + x];
+    }
+  }
+}
+
 void computeHarrisResponse(Mat &src, Mat &dest) {
   CvSize imgSize = src.size();
 
   Mat srcBlurred = Mat (imgSize, CV_8UC1);
   grayscaleGaussianBlur (src, srcBlurred, 5);
+
   int numPixels = imgSize.width * imgSize.height;
   unsigned char *imgData = (unsigned char *) malloc (sizeof (unsigned char) * numPixels);
 
@@ -81,17 +88,74 @@ void computeHarrisResponse(Mat &src, Mat &dest) {
   calculate_xgrad (imgSize.width, imgSize.height, imgData, xGrad);
   calculate_ygrad (imgSize.width, imgSize.height, imgData, yGrad);
 
+
+  Mat compatMat_XGrad = Mat (imgSize, CV_8UC1);
+  compatMat_XGrad.data = xGrad;
+  //imshow ("Xgrad", compatMat_XGrad);
+  
+  Mat compatMat_YGrad = Mat (imgSize, CV_8UC1);
+  compatMat_YGrad.data = yGrad;
+  //imshow ("Ygrad", compatMat_YGrad);
+
+  //grayscaleGaussianBlur (compatMat_XGrad, compatMat_XGrad, 5);
+  //grayscaleGaussianBlur (compatMat_YGrad, compatMat_YGrad, 5);
+
+
+
+  ushort *Ixx = (ushort *) malloc (numPixels * sizeof (ushort));
+  ushort *Ixy = (ushort *) malloc (numPixels * sizeof (ushort));
+  ushort *Iyy = (ushort *) malloc (numPixels * sizeof (ushort));
   
   
+  emul (imgSize.width, imgSize.height, xGrad, xGrad, Ixx);
+  emul (imgSize.width, imgSize.height, xGrad, yGrad, Ixy);
+  emul (imgSize.width, imgSize.height, yGrad, yGrad, Iyy);
 
-  // Mat compatMat_XGrad = Mat (imgSize, CV_8UC1);
-  // compatMat_XGrad.data = xGrad;
-  // imshow ("Xgrad", compatMat_XGrad);
-  // 
-  // Mat compatMat_YGrad = Mat (imgSize, CV_8UC1);
-  // compatMat_YGrad.data = yGrad;
-  // imshow ("Ygrad", compatMat_YGrad);
 
+
+  //Mat compatMat_Ixx = Mat (imgSize, CV_16U);
+  //compatMat_Ixx.data = (uchar *)Ixx;
+  //imshow ("Ixx", compatMat_Ixx);
+  //cvNamedWindow ("Ixx");
+  //imshow("Ixx", compatMat_Ixx);
+  //while (cvWaitKey (0) != 0x10001B);
+
+  //fprintf (stderr, "Vrijednosti xgrada:\n");
+  //for (int i = 0; i < imgSize.height; i++) {
+  //  for (int j = 0; j < imgSize.width; j++) {
+  //    fprintf (stderr, "(%3d, %3d): %i\n", i, j, Ixx[imgSize.width * i + j]);
+  //    getchar();
+  //  }
+  //}
+
+
+  
+  Mat compatMat_Ixy = Mat (imgSize, CV_16U);
+  compatMat_Ixy.data = (uchar *)Ixy;
+  imshow ("Ixy", compatMat_Ixy);
+
+//  Mat compatMat_Iyy = Mat (imgSize, CV_16U);
+//  compatMat_Iyy.data = (uchar *)Iyy;
+//  imshow ("Iyy", compatMat_Iyy);
+
+
+  
+//  double *harrisResponse = (double *) malloc (numPixels * sizeof (double));
+//
+//  for (int y = 0; y < imgSize.height; y++) {
+//    for (int x = 0; x < imgSize.width; x++) {
+//      double det = Ixx[imgSize.width * y + x] * Iyy[imgSize.width * y + x] - Ixy[imgSize.width * y + x] * Ixy[imgSize.width * y + x];
+//      double trace = Ixx[imgSize.width * y + x] + Iyy[imgSize.width * y + x];
+//
+//      harrisResponse[imgSize.width * y + x] = det - 0.06 * trace * trace;
+//    }
+//  }
+
+
+  //Mat compatMat_resp = Mat (imgSize, CV_64F);
+  //compatMat_resp.data = (uchar *)Ixy;
+  dest.data = (uchar *)Ixy;
+  //imshow ("response", compatMat_resp);
 
 
   return;
