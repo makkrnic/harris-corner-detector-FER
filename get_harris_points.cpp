@@ -21,7 +21,7 @@ void nonzero_t(Mat &harrisim_t, list<Point> &coords) {
     for(int i = 0; i < harrisim_t.rows; i++) {
         for(int j = 0; j < harrisim_t.cols; j++) {
             if ((int)harrisim_t.at<uchar>(i, j) != 0) {
-                coords.push_back(Point(i, j));
+                coords.push_back(Point(j, i));
             }
         }
     }
