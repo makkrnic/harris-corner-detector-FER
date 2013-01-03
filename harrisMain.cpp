@@ -63,7 +63,7 @@ int main (int argc, char *argv[]) {
   bool disableBlur = false;
   unsigned char kernelSize = 3;
 
-  if (argc < 2) {
+  if (argc < 3) {
       fprintf (stderr, "Upotreba: %s %s\n", argv[0], usage);
     return 1;
   }
