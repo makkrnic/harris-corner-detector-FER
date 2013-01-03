@@ -70,6 +70,29 @@ void emul (int w, int h, unsigned char *m1, unsigned char *m2, unsigned char *de
   }
 }
 
+/*
+1 2 1
+2 4 2
+1 2 1
+ */
+
+void emulWithWindow (int w, int h, unsigned char *m1, unsigned char *m2, unsigned char *dest) {
+    int window[9] = {1, 2, 1, 2, 4, 2, 1, 2, 1};
+    int n;
+    unsigned short sum;
+    for (int y = 1; y < h - 1; ++y) {
+        for (int x = 1; x < w - 1; ++x) {
+            sum = n = 0;
+            for (int k = y - 1; k < y + 2; ++k) {
+                for (int l = x - 1; l < x + 2; ++l) {
+                    sum += (window[n++]/16.0)*((ushort)m1[k * w + l] * (ushort)m2[k * w + l]);
+                } 
+            }
+            dest[y * w + x] = (unsigned char)(sum/65535.0 * 255);
+        }
+    }   
+}
+
 void computeHarrisResponse(Mat &src, Mat &dest) {
   CvSize imgSize = src.size();
 
@@ -102,14 +125,14 @@ void computeHarrisResponse(Mat &src, Mat &dest) {
   grayscaleGaussianBlur (compatMat_YGrad, compatMat_YGrad, 5);
 
 
-  unsigned char *Ixx = (unsigned char *) malloc (numPixels * sizeof (unsigned char));
-  unsigned char *Ixy = (unsigned char *) malloc (numPixels * sizeof (unsigned char));
-  unsigned char *Iyy = (unsigned char *) malloc (numPixels * sizeof (unsigned char));
+  unsigned char *Ixx = (unsigned char *) calloc (numPixels, sizeof (unsigned char));
+  unsigned char *Ixy = (unsigned char *) calloc (numPixels, sizeof (unsigned char));
+  unsigned char *Iyy = (unsigned char *) calloc (numPixels, sizeof (unsigned char));
   
   
-  emul (imgSize.width, imgSize.height, xGrad, xGrad, Ixx);
-  emul (imgSize.width, imgSize.height, xGrad, yGrad, Ixy);
-  emul (imgSize.width, imgSize.height, yGrad, yGrad, Iyy);
+  emulWithWindow (imgSize.width, imgSize.height, xGrad, xGrad, Ixx);
+  emulWithWindow (imgSize.width, imgSize.height, xGrad, yGrad, Ixy);
+  emulWithWindow (imgSize.width, imgSize.height, yGrad, yGrad, Iyy);
 
   free(xGrad);
   free(yGrad);
