@@ -88,6 +88,7 @@ void computeHarrisResponse(Mat &src, Mat &dest) {
   calculate_xgrad (imgSize.width, imgSize.height, imgData, xGrad);
   calculate_ygrad (imgSize.width, imgSize.height, imgData, yGrad);
 
+  free(imgData);
 
   Mat compatMat_XGrad = Mat (imgSize, CV_8UC1);
   compatMat_XGrad.data = xGrad;
@@ -101,7 +102,6 @@ void computeHarrisResponse(Mat &src, Mat &dest) {
   grayscaleGaussianBlur (compatMat_YGrad, compatMat_YGrad, 5);
 
 
-
   unsigned char *Ixx = (unsigned char *) malloc (numPixels * sizeof (unsigned char));
   unsigned char *Ixy = (unsigned char *) malloc (numPixels * sizeof (unsigned char));
   unsigned char *Iyy = (unsigned char *) malloc (numPixels * sizeof (unsigned char));
@@ -111,7 +111,8 @@ void computeHarrisResponse(Mat &src, Mat &dest) {
   emul (imgSize.width, imgSize.height, xGrad, yGrad, Ixy);
   emul (imgSize.width, imgSize.height, yGrad, yGrad, Iyy);
 
-
+  free(xGrad);
+  free(yGrad);
 
   Mat compatMat_Ixx = Mat (imgSize, CV_8UC1);
   compatMat_Ixx.data = (uchar *)Ixx;
@@ -142,7 +143,6 @@ void computeHarrisResponse(Mat &src, Mat &dest) {
   grayscaleGaussianBlur (compatMat_Iyy, compatMat_Iyy, 5);
   grayscaleGaussianBlur (compatMat_Ixy, compatMat_Ixy, 5);
 
-
   
   double *harrisResponse = (double *) malloc (numPixels * sizeof (double));
 
@@ -151,7 +151,7 @@ void computeHarrisResponse(Mat &src, Mat &dest) {
       double det = (int)Ixx[imgSize.width * y + x] * (int)Iyy[imgSize.width * y + x] - (int)Ixy[imgSize.width * y + x] * (int)Ixy[imgSize.width * y + x];
       double trace = (int)Ixx[imgSize.width * y + x] + (int)Iyy[imgSize.width * y + x];
       if (det != 0) {
-        printf ("\n\n\nDet nije 0\n\n\n");
+//        printf ("\n\n\nDet nije 0\n\n\n");
       }
 
       harrisResponse[imgSize.width * y + x] = det - 0.06 * (double)trace * (double)trace;
@@ -166,7 +166,10 @@ void computeHarrisResponse(Mat &src, Mat &dest) {
 
   memcpy (dest.data, harrisResponse, sizeof (double) * numPixels);
 
-
+  free(Ixx);
+  free(Ixy);
+  free(Iyy);
+  free(harrisResponse);
   
   return;
 }
