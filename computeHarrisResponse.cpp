@@ -4,56 +4,6 @@
 using namespace cv;
 using namespace std;
 
-void calculate_xgrad (int w, int h, unsigned char *src, unsigned char * dst) {
-  int x,y, sum;
-
-  for (y = 1; y < h -1; y++) {
-    for (x = 1; x < w -1; x++) {
-      /***************************
-       * Racunamo x gradijent    *
-       * prema Sobelovoj matrici *
-       * -1 0 1                  *
-       * -2 0 2                  *
-       * -1 0 1                  *
-       ***************************/
-      sum =
-          -     src[(y - 1) * w + (x - 1)]
-          +     src[(y - 1) * w + (x + 1)]
-          - 2 * src[(y    ) * w + (x - 1)]
-          + 2 * src[(y    ) * w + (x + 1)]
-          -     src[(y + 1) * w + (x - 1)]
-          +     src[(y + 1) * w + (x + 1)];
-
-      dst[y* w + x] = abs(sum);
-    }
-  }
-}
-
-void calculate_ygrad (int w, int h, unsigned char *src, unsigned char * dst) {
-  int x,y, sum;
-
-  for (y = 1; y < h -1; y++) {
-    for (x = 1; x < w -1; x++) {
-      /***************************
-       * Racunamo y gradijent    *
-       * prema Sobelovoj matrici *
-       * -1 -2 -1                *
-       *  0  0  0                *
-       *  1  2  1                *
-       ***************************/
-      sum =
-          -     src[(y - 1) * w + (x - 1)]
-          - 2 * src[(y - 1) * w + (x    )]
-          -     src[(y - 1) * w + (x + 1)]
-          +     src[(y + 1) * w + (x - 1)]
-          + 2 * src[(y + 1) * w + (x    )]
-          +     src[(y + 1) * w + (x + 1)];
-
-      dst[y* w + x] = abs(sum);
-    }
-  }
-}
-
 /**
  * Uzima matrice m1 i m2, velicine w*h, mnozi odgovarajuce elemente:
  * (0,0) * (0,0); (0,1) * (0,1)... i sprema ih u 
