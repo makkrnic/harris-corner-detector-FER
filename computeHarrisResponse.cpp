@@ -150,11 +150,11 @@ void computeHarrisResponse(Mat &src, Mat &dest) {
     for (int x = 0; x < imgSize.width; x++) {
       double det = (int)Ixx[imgSize.width * y + x] * (int)Iyy[imgSize.width * y + x] - (int)Ixy[imgSize.width * y + x] * (int)Ixy[imgSize.width * y + x];
       double trace = (int)Ixx[imgSize.width * y + x] + (int)Iyy[imgSize.width * y + x];
-      if (det != 0) {
-        printf ("\n\n\nDet nije 0\n\n\n");
-      }
+      // if (det != 0) {
+      //   printf ("\n\n\nDet nije 0\n\n\n");
+      // }
 
-      harrisResponse[imgSize.width * y + x] = det - 0.06 * (double)trace * (double)trace;
+      harrisResponse[imgSize.width * y + x] = (det - 0.06 * (double)trace * (double)trace);
     }
   }
 
