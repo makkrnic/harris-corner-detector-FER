@@ -113,6 +113,10 @@ void computeHarrisResponse(Mat &src, Mat &dest) {
 
   Mat compatMat_resp = Mat (imgSize, CV_64F);
   compatMat_resp.data = (uchar *)harrisResponse;
+
+  // blurranje za bolje rezultate
+  GaussianBlur( compatMat_resp, compatMat_resp, Size(3,3), 3, BORDER_DEFAULT );
+
   //dest.data = (uchar *)Ixy;
   if (debug) imshow ("response", compatMat_resp);
 
