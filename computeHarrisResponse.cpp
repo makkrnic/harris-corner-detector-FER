@@ -4,6 +4,8 @@
 using namespace cv;
 using namespace std;
 
+extern bool debug;
+
 void calculate_xgrad (int w, int h, unsigned char *src, unsigned char * dst) {
   int x,y, sum;
 
@@ -100,14 +102,14 @@ void computeHarrisResponse(Mat &src, Mat &dest) {
   //XGrad_16.convertTo (compatMat_XGrad, CV_8UC1);
   //compatMat_XGrad.data = xGrad;
   xGrad = compatMat_XGrad.data;
-  imshow ("Xgrad", compatMat_XGrad);
+  if (debug) imshow ("Xgrad", compatMat_XGrad);
   
   Mat compatMat_YGrad = Mat (imgSize, CV_8UC1);
   convertScaleAbs (YGrad_16, compatMat_YGrad);
   //YGrad_16.convertTo (compatMat_YGrad, CV_8UC1);
   //compatMat_YGrad.data = yGrad;
   yGrad = compatMat_YGrad.data;
-  imshow ("Ygrad", compatMat_YGrad);
+  if (debug) imshow ("Ygrad", compatMat_YGrad);
 
   free(imgData);
 
@@ -130,15 +132,15 @@ void computeHarrisResponse(Mat &src, Mat &dest) {
 
   Mat compatMat_Ixx = Mat (imgSize, CV_8UC1);
   compatMat_Ixx.data = (uchar *)Ixx;
-  imshow ("Ixx", compatMat_Ixx);
+  if (debug) imshow ("Ixx", compatMat_Ixx);
   
   Mat compatMat_Ixy = Mat (imgSize, CV_8UC1);
   compatMat_Ixy.data = (uchar *)Ixy;
-  imshow ("Ixy", compatMat_Ixy);
+  if (debug) imshow ("Ixy", compatMat_Ixy);
 
   Mat compatMat_Iyy = Mat (imgSize, CV_8UC1);
   compatMat_Iyy.data = (uchar *)Iyy;
-  imshow ("Iyy", compatMat_Iyy);
+  if (debug) imshow ("Iyy", compatMat_Iyy);
 
 
   grayscaleGaussianBlur (compatMat_Ixx, compatMat_Ixx, 5);
@@ -165,7 +167,7 @@ void computeHarrisResponse(Mat &src, Mat &dest) {
   Mat compatMat_resp = Mat (imgSize, CV_64F);
   compatMat_resp.data = (uchar *)harrisResponse;
   //dest.data = (uchar *)Ixy;
-  imshow ("response", compatMat_resp);
+  if (debug) imshow ("response", compatMat_resp);
 
   memcpy (dest.data, harrisResponse, sizeof (double) * numPixels);
 

@@ -51,14 +51,16 @@
 // 
 // }
 
+bool debug = false;
+
 int main (int argc, char *argv[]) {
   Mat img, harrisResponse, imgBlurred;
   std::list<Point> points;
   Point tmpPoint;
 
-  char usage[] = "[-s] [-k kernel_size] [-t treshold] -i ime_slike";
+  char usage[] = "[-d] [-s] [-k kernel_size] [-t treshold] -i ime_slike";
   char opt;
-  char optstring[] = "si:k:t:";
+  char optstring[] = "si:k:t:d";
   char *imgName = NULL;
   bool disableBlur = false;
   unsigned char kernelSize = 3;
@@ -87,6 +89,10 @@ int main (int argc, char *argv[]) {
       case 't':
         treshold = atof (optarg);
         assert (treshold > 0);
+      break;
+
+      case 'd':
+        debug = true;
       break;
 
       default:
@@ -127,7 +133,7 @@ int main (int argc, char *argv[]) {
   //   }
   // }   
   
-  imshow ("harrisResponse", harrisResponse);
+  if (debug) imshow ("harrisResponse", harrisResponse);
 
   points = get_harris_points (harrisResponse, 5, treshold);
 
