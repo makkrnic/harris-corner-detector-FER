@@ -31,15 +31,12 @@ void computeHarrisResponse(Mat &src, Mat &dest) {
 
   memcpy (imgData, srcBlurred.data, sizeof (unsigned char) * numPixels);
 
-  unsigned char *xGrad = NULL; // (unsigned char *) calloc (numPixels, sizeof (unsigned char));
-  unsigned char *yGrad = NULL; // (unsigned char *) calloc (numPixels, sizeof (unsigned char));
+  unsigned char *xGrad = NULL;
+  unsigned char *yGrad = NULL;
 
   Mat XGrad_16 = Mat (imgSize, CV_16S);
   Mat YGrad_16 = Mat (imgSize, CV_16S);
   
-  //calculate_xgrad (imgSize.width, imgSize.height, imgData, xGrad);
-  //calculate_ygrad (imgSize.width, imgSize.height, imgData, yGrad);
-
   Sobel (src, XGrad_16, CV_16S, 1, 0, 3, 1, 0);
   Sobel (src, YGrad_16, CV_16S, 0, 1, 3, 1, 0);
 
