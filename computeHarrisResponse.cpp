@@ -96,16 +96,18 @@ void computeHarrisResponse(Mat &src, Mat &dest) {
   
   
   Mat compatMat_XGrad = Mat (imgSize, CV_8UC1);
-  XGrad_16.convertTo (compatMat_XGrad, CV_8UC1);
+  convertScaleAbs (XGrad_16, compatMat_XGrad);
+  //XGrad_16.convertTo (compatMat_XGrad, CV_8UC1);
   //compatMat_XGrad.data = xGrad;
   xGrad = compatMat_XGrad.data;
-  //imshow ("Xgrad", compatMat_XGrad);
+  imshow ("Xgrad", compatMat_XGrad);
   
   Mat compatMat_YGrad = Mat (imgSize, CV_8UC1);
-  YGrad_16.convertTo (compatMat_YGrad, CV_8UC1);
+  convertScaleAbs (YGrad_16, compatMat_YGrad);
+  //YGrad_16.convertTo (compatMat_YGrad, CV_8UC1);
   //compatMat_YGrad.data = yGrad;
   yGrad = compatMat_YGrad.data;
-  //imshow ("Ygrad", compatMat_YGrad);
+  imshow ("Ygrad", compatMat_YGrad);
 
   free(imgData);
 
@@ -129,19 +131,6 @@ void computeHarrisResponse(Mat &src, Mat &dest) {
   Mat compatMat_Ixx = Mat (imgSize, CV_8UC1);
   compatMat_Ixx.data = (uchar *)Ixx;
   imshow ("Ixx", compatMat_Ixx);
-  //cvNamedWindow ("Ixx");
-  //imshow("Ixx", compatMat_Ixx);
-  //while (cvWaitKey (0) != 0x10001B);
-
-  //fprintf (stderr, "Vrijednosti xgrada:\n");
-  //for (int i = 0; i < imgSize.height; i++) {
-  //  for (int j = 0; j < imgSize.width; j++) {
-  //    fprintf (stderr, "(%3d, %3d): %i\n", i, j, Ixx[imgSize.width * i + j]);
-  //    getchar();
-  //  }
-  //}
-
-
   
   Mat compatMat_Ixy = Mat (imgSize, CV_8UC1);
   compatMat_Ixy.data = (uchar *)Ixy;
@@ -150,6 +139,7 @@ void computeHarrisResponse(Mat &src, Mat &dest) {
   Mat compatMat_Iyy = Mat (imgSize, CV_8UC1);
   compatMat_Iyy.data = (uchar *)Iyy;
   imshow ("Iyy", compatMat_Iyy);
+
 
   grayscaleGaussianBlur (compatMat_Ixx, compatMat_Ixx, 5);
   grayscaleGaussianBlur (compatMat_Iyy, compatMat_Iyy, 5);
