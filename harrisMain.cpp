@@ -56,12 +56,13 @@ int main (int argc, char *argv[]) {
   std::list<Point> points;
   Point tmpPoint;
 
-  char usage[] = "[-s] [-k kernel_size] -i ime_slike";
+  char usage[] = "[-s] [-k kernel_size] [-t treshold] -i ime_slike";
   char opt;
-  char optstring[] = "si:k:";
+  char optstring[] = "si:k:t:";
   char *imgName = NULL;
   bool disableBlur = false;
   unsigned char kernelSize = 3;
+  float treshold = 0.1;
 
   if (argc < 3) {
       fprintf (stderr, "Upotreba: %s %s\n", argv[0], usage);
@@ -81,6 +82,11 @@ int main (int argc, char *argv[]) {
       case 'k':
         kernelSize = atoi(optarg)/2 * 2 + 1;
         assert (kernelSize > 2);
+      break;
+
+      case 't':
+        treshold = atof (optarg);
+        assert (treshold > 0);
       break;
 
       default:
@@ -123,7 +129,7 @@ int main (int argc, char *argv[]) {
   
   imshow ("harrisResponse", harrisResponse);
 
-  points = get_harris_points (harrisResponse, 5, 0.05);
+  points = get_harris_points (harrisResponse, 5, treshold);
 
   plotHarrisPoints (img, points);
 
