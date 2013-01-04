@@ -135,7 +135,7 @@ int main (int argc, char *argv[]) {
   
   if (debug) imshow ("harrisResponse", harrisResponse);
 
-  points = get_harris_points (harrisResponse, 5, treshold);
+  points = get_harris_points (harrisResponse, 10, treshold);
 
   plotHarrisPoints (img, points);
 
