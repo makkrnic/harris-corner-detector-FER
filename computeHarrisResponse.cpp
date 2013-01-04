@@ -17,12 +17,12 @@ void calculate_xgrad (int w, int h, unsigned char *src, unsigned char * dst) {
        * -1 0 1                  *
        ***************************/
       sum =
-          -     src[(y - 1) * w + (x - 1)]
-          +     src[(y - 1) * w + (x + 1)]
-          - 2 * src[(y    ) * w + (x - 1)]
-          + 2 * src[(y    ) * w + (x + 1)]
-          -     src[(y + 1) * w + (x - 1)]
-          +     src[(y + 1) * w + (x + 1)];
+          - 3 * src[(y - 1) * w + (x - 1)]
+          + 3 * src[(y - 1) * w + (x + 1)]
+          - 10* src[(y    ) * w + (x - 1)]
+          + 10* src[(y    ) * w + (x + 1)]
+          - 3 * src[(y + 1) * w + (x - 1)]
+          + 3 * src[(y + 1) * w + (x + 1)];
 
       dst[y* w + x] = abs(sum);
     }
@@ -42,12 +42,12 @@ void calculate_ygrad (int w, int h, unsigned char *src, unsigned char * dst) {
        *  1  2  1                *
        ***************************/
       sum =
-          -     src[(y - 1) * w + (x - 1)]
-          - 2 * src[(y - 1) * w + (x    )]
-          -     src[(y - 1) * w + (x + 1)]
-          +     src[(y + 1) * w + (x - 1)]
-          + 2 * src[(y + 1) * w + (x    )]
-          +     src[(y + 1) * w + (x + 1)];
+          - 3 * src[(y - 1) * w + (x - 1)]
+          - 10* src[(y - 1) * w + (x    )]
+          - 3 * src[(y - 1) * w + (x + 1)]
+          + 3 * src[(y + 1) * w + (x - 1)]
+          + 10* src[(y + 1) * w + (x    )]
+          + 3 * src[(y + 1) * w + (x + 1)];
 
       dst[y* w + x] = abs(sum);
     }
