@@ -51,7 +51,7 @@ bool checkMask(Mat &mask, Point point, int min_dist) {
     else {
         for (int i = point.x - min_dist + 1; i < point.x + min_dist; ++i) {
             for( int j = point.y - min_dist + 1; j < point.y + min_dist; ++j ) {
-                mask.at<uchar>(i, j) = 0; 
+                mask.at<uchar>(j, i) = 0; 
         }
     }
         return true;
@@ -110,9 +110,9 @@ list<Point> get_harris_points (Mat &harrisim, int min_dist, float thresh) {
         mask.col(mask.cols-i-1).setTo(Scalar(0));
     }
 
-    list<HarrisPointValue>::iterator iter;
+//    list<HarrisPointValue>::const_iterator iter, end;
     // select the best points taking min_distance into account
-    for (iter = candidate_values.begin(); iter != candidate_values.end(); ++iter) {
+    for (auto iter = candidate_values.begin(); iter != candidate_values.end(); ++iter) {
 //        cout << " " << iter->point.x << ", " << iter->point.y << endl;
         if (checkMask(mask, iter->point, min_dist)) {
             filtered_coords.push_back(Point(iter->point));
