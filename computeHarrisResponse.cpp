@@ -74,29 +74,41 @@ void computeHarrisResponse(Mat &src, Mat &dest) {
   CvSize imgSize = src.size();
 
   Mat srcBlurred = Mat (imgSize, CV_8UC1);
-  grayscaleGaussianBlur (src, srcBlurred, 5);
+  grayscaleGaussianBlur (src, srcBlurred, 11);
 
   int numPixels = imgSize.width * imgSize.height;
   unsigned char *imgData = (unsigned char *) malloc (sizeof (unsigned char) * numPixels);
 
   memcpy (imgData, srcBlurred.data, sizeof (unsigned char) * numPixels);
 
-  unsigned char *xGrad = (unsigned char *) calloc (numPixels, sizeof (unsigned char));
-  unsigned char *yGrad = (unsigned char *) calloc (numPixels, sizeof (unsigned char));
+  unsigned char *xGrad = NULL; // (unsigned char *) calloc (numPixels, sizeof (unsigned char));
+  unsigned char *yGrad = NULL; // (unsigned char *) calloc (numPixels, sizeof (unsigned char));
+
+  Mat XGrad_16 = Mat (imgSize, CV_16S);
+  Mat YGrad_16 = Mat (imgSize, CV_16S);
   
+  //calculate_xgrad (imgSize.width, imgSize.height, imgData, xGrad);
+  //calculate_ygrad (imgSize.width, imgSize.height, imgData, yGrad);
 
-  calculate_xgrad (imgSize.width, imgSize.height, imgData, xGrad);
-  calculate_ygrad (imgSize.width, imgSize.height, imgData, yGrad);
+  Sobel (src, XGrad_16, CV_16S, 1, 0, 3, 1, 0);
+  Sobel (src, YGrad_16, CV_16S, 0, 1, 3, 1, 0);
 
-  free(imgData);
-
+  
+  
   Mat compatMat_XGrad = Mat (imgSize, CV_8UC1);
-  compatMat_XGrad.data = xGrad;
+  XGrad_16.convertTo (compatMat_XGrad, CV_8UC1);
+  //compatMat_XGrad.data = xGrad;
+  xGrad = compatMat_XGrad.data;
   //imshow ("Xgrad", compatMat_XGrad);
   
   Mat compatMat_YGrad = Mat (imgSize, CV_8UC1);
-  compatMat_YGrad.data = yGrad;
+  YGrad_16.convertTo (compatMat_YGrad, CV_8UC1);
+  //compatMat_YGrad.data = yGrad;
+  yGrad = compatMat_YGrad.data;
   //imshow ("Ygrad", compatMat_YGrad);
+
+  free(imgData);
+
 
   grayscaleGaussianBlur (compatMat_XGrad, compatMat_XGrad, 5);
   grayscaleGaussianBlur (compatMat_YGrad, compatMat_YGrad, 5);
@@ -111,8 +123,8 @@ void computeHarrisResponse(Mat &src, Mat &dest) {
   emul (imgSize.width, imgSize.height, xGrad, yGrad, Ixy);
   emul (imgSize.width, imgSize.height, yGrad, yGrad, Iyy);
 
-  free(xGrad);
-  free(yGrad);
+  //free(xGrad);
+  //free(yGrad);
 
   Mat compatMat_Ixx = Mat (imgSize, CV_8UC1);
   compatMat_Ixx.data = (uchar *)Ixx;
@@ -154,7 +166,8 @@ void computeHarrisResponse(Mat &src, Mat &dest) {
       //   printf ("\n\n\nDet nije 0\n\n\n");
       // }
 
-      harrisResponse[imgSize.width * y + x] = (det - 0.06 * (double)trace * (double)trace);
+      //harrisResponse[imgSize.width * y + x] = (det - 0.06 * (double)trace * (double)trace);
+      harrisResponse[imgSize.width * y + x] = det/trace;
     }
   }
 
