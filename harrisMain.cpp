@@ -123,7 +123,7 @@ int main (int argc, char *argv[]) {
   
   imshow ("harrisResponse", harrisResponse);
 
-  points = get_harris_points (harrisResponse, 5, 0.05);
+  points = get_harris_points (harrisResponse, 10, 0.01);
 
   plotHarrisPoints (img, points);
 
