@@ -10,47 +10,6 @@
 #include "harris_plot.hpp"
 #include "computeHarrisResponse.h"
 
-// void debug_saveResponse (Mat harrisResponse) {
-//   FILE *fo = NULL;
-//   char fname[] = "harrisResponseDebugC++";
-// 
-//   fo = fopen (fname, "w");
-// 
-// 
-//   for(int row = 0; row < harrisResponse.rows; ++row) {
-//     uchar* p = harrisResponse.ptr(row);
-//     for(int col = 0; col < harrisResponse.cols; ++col) {
-//       fprintf (fo, "%d\n", *p);
-//       p += 4;  //points to each pixel value in turn assuming a CV_8UC1 greyscale image 
-//     }
-//   }   
-// }
-// 
-// void debug_loadResponse (Mat& harrisResponse) {
-//   
-//   FILE *fi = NULL;
-//   char fname[] = "harrisResponseDebugPython";
-//   float tmpFloat;
-//   int k = 0;
-// 
-//   fi = fopen (fname, "r");
-// 
-//   while ((fscanf (fi, "%d\n", &tmpFloat)) != EOF) {
-//     //fprintf (stderr, "Loading: %f.......", tmpFloat);
-//     harrisResponse.at<int>(k) = tmpFloat;
-//     //fprintf (stderr, "Ucitano: %f\n", harrisResponse.at<int>(k));
-//     k++;
-//   }
-//   
-//   
-//   for(int row = 0; row < harrisResponse.rows; ++row) {
-//     for(int col = 0; col < harrisResponse.cols; ++col) {
-//       fprintf (stderr, "Element: %f\n", harrisResponse.at<int>(row,col));
-//     }
-//   }   
-// 
-// }
-
 bool debug = false;
 
 int main (int argc, char *argv[]) {
@@ -67,7 +26,7 @@ int main (int argc, char *argv[]) {
   float treshold = 0.1;
 
   if (argc < 3) {
-      fprintf (stderr, "Upotreba: %s %s\n", argv[0], usage);
+    fprintf (stderr, "Upotreba: %s %s\n", argv[0], usage);
     return 1;
   }
 
