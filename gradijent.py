@@ -1,5 +1,4 @@
 from PIL import Image
-import pylab
 from pylab import *
 from scipy.ndimage import filters
 from numpy import *
@@ -37,15 +36,15 @@ def grad(im,sigma=1,prozor=5):
         IyF1.append(IyF[i]-yS)
 
     #stvaranje matrice sa X i Y vrijednostima gradijenata
-    X1=[]
-    X1.append(IxF1)
-    X1.append(IyF1)
-    X1=array(X1)
-    X1T=X1.T
+    XY=[]
+    XY.append(IxF1)
+    XY.append(IyF1)
+    XY=array(XY)
+    XYT=XY.T
 
 
     #kovarijacijska matrica
-    S=(1./(len(IxF)-1))*dot(X1,X1T)
+    S=(1./(len(IxF)-1))*dot(XY,XYT)
 
     #eigenvalues
     eva1=0.5*(S[0,0]+S[1,1]+sqrt(pow((S[0,0]-S[1,1]),2)+4*pow(S[0,1],2)))
@@ -62,10 +61,22 @@ def grad(im,sigma=1,prozor=5):
 
     #ako slucajno nazivnik ispadne 0
     else:
-        eve1=0
-        eve2=1
-        kut=90  
-
+        poz=IxF[0]
+        pog=0
+        for i in range(0,len(IxF)):
+            if poz!=IxF[i]:
+                pog=1
+                break
+        if pog==0:
+            eve1=0
+            eve2=1
+            kut=90
+            
+        else:
+            eve1=1
+            eve2=0
+            kut=0    
+ 
     ells = Ellipse((xS,yS),4*sqrt(eva1),4*sqrt(eva2),kut)
     ells.set_alpha(0.3) 
   

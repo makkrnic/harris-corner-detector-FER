@@ -1,28 +1,23 @@
-#!/usr/bin/env python2
-
 from pylab import *
 from numpy import *
-from PIL import Image
 from scipy.ndimage import filters
-import sys
 
 
 def compute_harris_response(im,sigma=3):
-    """ Compute the Harris corner detector response function 
-        for each pixel in a graylevel image. """
+    """ Izracunaj odziv Harrisove funkcije za detekciju kuteva. """
     
-    # derivatives
+    # derivati
     imx = zeros(im.shape)
     filters.gaussian_filter(im, (sigma,sigma), (0,1), imx)
     imy = zeros(im.shape)
     filters.gaussian_filter(im, (sigma,sigma), (1,0), imy)
     
-    # compute components of the Harris matrix
+    # izracunaj komponente Harrisove matrice
     Wxx = filters.gaussian_filter(imx*imx,sigma)
     Wxy = filters.gaussian_filter(imx*imy,sigma)
     Wyy = filters.gaussian_filter(imy*imy,sigma)
     
-    # determinant and trace
+    # determinanta i trag matrice
     Wdet = Wxx*Wyy - Wxy**2
     Wtr = Wxx + Wyy
     
@@ -30,28 +25,25 @@ def compute_harris_response(im,sigma=3):
    
     
 def get_harris_points(harrisim,min_dist=10,threshold=0.1):
-    """ Return corners from a Harris response image
-        min_dist is the minimum number of pixels separating 
-        corners and image boundary. """
+    """ Odaberi tocke koje ce biti proglasene kutevima."""
     
-    # find top corner candidates above a threshold
+    # izbaci one tocke cija vrijednost funkcije nije iznad granicne
     corner_threshold = harrisim.max() * threshold
     harrisim_t = (harrisim > corner_threshold) * 1
     
-    # get coordinates of candidates
+    # koordinate kandidate za kuteve
     coords = array(harrisim_t.nonzero()).T
     
-    # ...and their values
+    # njihove vrijednosti
     candidate_values = [harrisim[c[0],c[1]] for c in coords]
     
-    # sort candidates
     index = argsort(candidate_values)
     
-    # store allowed point locations in array
+    # pomocna matrica koja oznacuje mjesta na kojima je dozvoljen kut
     allowed_locations = zeros(harrisim.shape)
     allowed_locations[min_dist:-min_dist,min_dist:-min_dist] = 1
     
-    # select the best points taking min_distance into account
+    # izaberi kuteve uzimajuci u obzir minimalnu udaljenost izmedju 2 kuta
     filtered_coords = []
     for i in index:
         if allowed_locations[coords[i,0],coords[i,1]] == 1:
@@ -63,7 +55,7 @@ def get_harris_points(harrisim,min_dist=10,threshold=0.1):
     
     
 def plot_harris_points(image,filtered_coords):
-    """ Plots corners found in image. """
+    """ Oznaci kuteve na slici. """
     
     figure()
     gray()
@@ -144,10 +136,7 @@ def appendimages(im1,im2):
     
     
 def plot_matches(im1,im2,locs1,locs2,matchscores):
-    """ Show a figure with lines joining the accepted matches 
-        input: im1,im2 (images as arrays), locs1,locs2 (feature locations), 
-        matchscores (as output from 'match()'), 
-        show_below (if images should be shown below matches). """
+    """ Povezi tocke koje su uparene. """
     
     im3 = appendimages(im1,im2)
 
@@ -161,7 +150,7 @@ def plot_matches(im1,im2,locs1,locs2,matchscores):
             plot([locs1[i][1],locs2[m][1]+cols1],[locs1[i][0],locs2[m][0]],'c')
     axis('off')
 
-def upari(im1,im2,sigma,wid):
+def upari(im1,im2,sigma=1,wid=5):
 
     harrisim = compute_harris_response(im1,sigma)
     filtered_coords1 = get_harris_points(harrisim[0],wid+1)
@@ -174,20 +163,3 @@ def upari(im1,im2,sigma,wid):
     gray()
     plot_matches(im1,im2,filtered_coords1,filtered_coords2,matches)
     show()
-
-if __name__ == '__main__':
-  im = array(Image.open(sys.argv[1]).convert('L'))
-  (harrisim,_,_) = compute_harris_response(im)
-  
-  
-  dbgfile = open('harrisResponseDebugPython', 'w+')
-  for r in harrisim:
-    for e in r:
-      #print e
-      dbgfile.write (str(e) + '\n')
-  
-  dbgfile.close()
-
-
-  filtered = get_harris_points (harrisim, 6)
-  plot_harris_points (im, filtered)
