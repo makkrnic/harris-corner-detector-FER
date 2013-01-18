@@ -22,7 +22,7 @@ void emul (int w, int h, unsigned char *m1, unsigned char *m2, unsigned char *de
   }
 }
 
-void computeHarrisResponse(Mat &src, Mat &dest) {
+void computeHarrisResponse(Mat &src, Mat &dest, int sigma) {
   CvSize imgSize = src.size();
 
   Mat srcBlurred = Mat (imgSize, CV_8UC1);
@@ -61,8 +61,8 @@ void computeHarrisResponse(Mat &src, Mat &dest) {
   free(imgData);
 
 
-  grayscaleGaussianBlur (compatMat_XGrad, compatMat_XGrad, 5);
-  grayscaleGaussianBlur (compatMat_YGrad, compatMat_YGrad, 5);
+  grayscaleGaussianBlur (compatMat_XGrad, compatMat_XGrad, sigma);
+  grayscaleGaussianBlur (compatMat_YGrad, compatMat_YGrad, sigma);
 
 
   unsigned char *Ixx = (unsigned char *) malloc (numPixels * sizeof (unsigned char));
@@ -90,9 +90,9 @@ void computeHarrisResponse(Mat &src, Mat &dest) {
   if (debug) imshow ("Iyy", compatMat_Iyy);
 
 
-  grayscaleGaussianBlur (compatMat_Ixx, compatMat_Ixx, 5);
-  grayscaleGaussianBlur (compatMat_Iyy, compatMat_Iyy, 5);
-  grayscaleGaussianBlur (compatMat_Ixy, compatMat_Ixy, 5);
+  grayscaleGaussianBlur (compatMat_Ixx, compatMat_Ixx, sigma);
+  grayscaleGaussianBlur (compatMat_Iyy, compatMat_Iyy, sigma);
+  grayscaleGaussianBlur (compatMat_Ixy, compatMat_Ixy, sigma);
 
   
   double *harrisResponse = (double *) malloc (numPixels * sizeof (double));

@@ -17,13 +17,14 @@ int main (int argc, char *argv[]) {
   std::list<Point> points;
   Point tmpPoint;
 
-  char usage[] = "[-d] [-s] [-k kernel_size] [-t treshold] -i ime_slike";
+  char usage[] = "[-d] [-s] [-k kernel_size] [-b integration_sigma ] [-t treshold] -i ime_slike";
   char opt;
-  char optstring[] = "si:k:t:d";
+  char optstring[] = "si:k:t:b:d";
   char *imgName = NULL;
   bool disableBlur = false;
   unsigned char kernelSize = 3;
   float treshold = 0.1;
+  int sigma = 5;
 
   if (argc < 3) {
     fprintf (stderr, "Upotreba: %s %s\n", argv[0], usage);
@@ -43,6 +44,11 @@ int main (int argc, char *argv[]) {
       case 'k':
         kernelSize = atoi(optarg)/2 * 2 + 1;
         assert (kernelSize > 2);
+      break;
+
+      case 'b':
+        sigma = atoi(optarg);
+        assert (sigma > 0);
       break;
 
       case 't':
@@ -81,7 +87,7 @@ int main (int argc, char *argv[]) {
   harrisResponse = Mat (img.size(), CV_64F);
 
   
-  computeHarrisResponse(imgBlurred, harrisResponse);
+  computeHarrisResponse(imgBlurred, harrisResponse, sigma);
 
   //debug_saveResponse (harrisResponse);
   //debug_loadResponse (harrisResponse);

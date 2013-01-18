@@ -5,6 +5,6 @@
 #include <opencv2/imgproc/imgproc.hpp>
 #include <opencv2/highgui/highgui.hpp>
 
-void computeHarrisResponse(cv::Mat &src, cv::Mat &dest);
+void computeHarrisResponse(cv::Mat &src, cv::Mat &dest, int sigma);
 
 #endif
