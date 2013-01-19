@@ -1,7 +1,8 @@
+from PIL import Image
 from pylab import *
-from numpy import *
 from scipy.ndimage import filters
-
+from numpy import *
+from matplotlib.patches import Ellipse
 
 def compute_harris_response(im,sigma=3):
     """ Izracunaj odziv Harrisove funkcije za detekciju kuteva. """
@@ -21,7 +22,7 @@ def compute_harris_response(im,sigma=3):
     Wdet = Wxx*Wyy - Wxy**2
     Wtr = Wxx + Wyy
     
-    return Wdet/Wtr,imx,imy
+    return Wdet/Wtr
    
     
 def get_harris_points(harrisim,min_dist=10,threshold=0.1):
@@ -139,7 +140,7 @@ def plot_matches(im1,im2,locs1,locs2,matchscores):
     """ Povezi tocke koje su uparene. """
     
     im3 = appendimages(im1,im2)
-
+    
     im3 = vstack((im3,im3)) #prikazi i originalnu sliku bez spojnih linija
     
     imshow(im3)
@@ -153,13 +154,141 @@ def plot_matches(im1,im2,locs1,locs2,matchscores):
 def upari(im1,im2,sigma=1,wid=5):
 
     harrisim = compute_harris_response(im1,sigma)
-    filtered_coords1 = get_harris_points(harrisim[0],wid+1)
+    filtered_coords1 = get_harris_points(harrisim,wid+1)
     d1 = get_descriptors(im1,filtered_coords1,wid)
     harrisim = compute_harris_response(im2,sigma)
-    filtered_coords2 = get_harris_points(harrisim[0],wid+1)
+    filtered_coords2 = get_harris_points(harrisim,wid+1)
     d2 = get_descriptors(im2,filtered_coords2,wid)
     matches = match_twosided(d1,d2)
     figure()
     gray()
     plot_matches(im1,im2,filtered_coords1,filtered_coords2,matches)
     show()
+
+def grad(im,sigma=1,prozor=5):
+   
+    Ix = zeros(im.shape)
+    filters.gaussian_filter(im, (sigma,sigma), (0,1), Ix)
+    Iy = zeros(im.shape)
+    filters.gaussian_filter(im, (sigma,sigma), (1,0), Iy)
+
+    #koordinate oko kojih ce se gledati gradijent
+    imshow(im)
+    koord = ginput(1)
+    x = round(koord[0][1])
+    y = round(koord[0][0])
+    prozor= int(prozor)
+    
+    #uzmi gradijente Ix i Iy unutar tog prozora
+    IxF = (Ix[x-prozor:x+prozor+1,y-prozor:y+prozor+1]).flatten()
+    IyF = (Iy[x-prozor:x+prozor+1,y-prozor:y+prozor+1]).flatten()
+
+    xS=yS=0
+    IxF1=[]
+    IyF1=[]
+
+    xS=sum(IxF)/len(IxF)
+    #x koordinata centra
+    yS=sum(IyF)/len(IyF)   
+    #y koordinata centra
+
+    #pomicanje tocaka prema ishodistu
+    for i in range(0,len(IxF)):
+        IxF1.append(IxF[i]-xS)
+        IyF1.append(IyF[i]-yS)
+
+    #stvaranje matrice sa X i Y vrijednostima gradijenata
+    XY=[]
+    XY.append(IxF1)
+    XY.append(IyF1)
+    XY=array(XY)
+    XYT=XY.T
+
+
+    #kovarijacijska matrica
+    S=(1./(len(IxF)-1))*dot(XY,XYT)
+
+    #eigenvalues
+    eva1=0.5*(S[0,0]+S[1,1]+sqrt(pow((S[0,0]-S[1,1]),2)+4*pow(S[0,1],2)))
+    eva2=0.5*(S[0,0]+S[1,1]-sqrt(pow((S[0,0]-S[1,1]),2)+4*pow(S[0,1],2)))
+
+    #eigenvectori
+    if (pow((eva1-S[0,0]),2)+pow(S[0,1],2))!=0:
+        eve1=S[0,1]/sqrt(pow((eva1-S[0,0]),2)+pow(S[0,1],2))
+        eve2=(eva1-S[0,0])/sqrt(pow((eva1-S[0,0]),2)+pow(S[0,1],2))
+
+    #dobivanje kuta
+        tang=eve2/eve1
+        kut=arctan(tang)*180./3.14
+
+    #ako slucajno nazivnik ispadne 0
+    else:
+        poz=IxF[0]
+        pog=0
+        for i in range(0,len(IxF)):
+            if poz!=IxF[i]:
+                pog=1
+                break
+        if pog==0:
+            eve1=0
+            eve2=1
+            kut=90
+            
+        else:
+            eve1=1
+            eve2=0
+            kut=0    
+ 
+    ells = Ellipse((xS,yS),4*sqrt(eva1),4*sqrt(eva2),kut)
+    ells.set_alpha(0.3) 
+  
+    fig = figure()
+    ax = fig.add_subplot(111,aspect='equal')
+    ax.add_artist(ells)
+    ax.plot(IxF,IyF,'mo') #crtaj histogram
+
+    #crtaj eigenvectore
+    pomx = 2*sqrt(eva1)*eve1
+    pomy = 2*sqrt(eva1)*eve2
+    ax.arrow(xS,yS,pomx,pomy,width=0.008,length_includes_head='true',color='k')
+    
+    pomx = 2*sqrt(eva2)*eve2
+    pomy = 2*sqrt(eva2)*eve1*(-1)
+    ax.arrow(xS,yS,pomx,pomy,width=0.008,length_includes_head='true',color='k')
+
+
+    #crtanje koordinatnih osi
+    D = 1.1*min(IyF)
+    G = 1.1*max(IyF)
+    if(D > -1):
+        D = -1
+    if(G < 1):
+        G = 1
+    ax.plot([0,0],[D,G],'r') # y-os
+    ax.plot([0,0.02],[G,G*0.96],'r')
+    ax.plot([0,-0.02],[G,G*0.96],'r')
+    ax.text(0.04, G, 'Iy', style='italic',
+        bbox={'facecolor':'gray', 'alpha':0, 'pad':10})
+    
+
+    D = 1.1*min(IxF)
+    G = 1.1*max(IxF)
+    if(D > -1):
+        D = -1
+    if(G < 1):
+        G = 1 
+    ax.plot([D,G],[0,0],'r') # x-os
+    ax.plot([G,G*0.96],[0,0.02],'r')
+    ax.plot([G,G*0.96],[0,-0.02],'r')
+    ax.text(G, 0.04, 'Ix', style='italic',
+        bbox={'facecolor':'gray', 'alpha':0, 'pad':10})
+    
+    ax.set_xlabel('Ix')
+    ax.set_ylabel('Iy')
+    ax.set_title('Histogram')
+
+
+    gray()
+    grid('on')
+    show()
+
